@@ -5,7 +5,14 @@ pyJulius
 
 A python interface to Julius, the speech recognition system.
 
-The primary function right now is the forced aligner.  
+The primary function right now is the Japanese forced aligner.  Given the transcript
+for an audio file in Japanese, this series of scripts will estimate where those 
+phones were produced in the audio.
+
+/test/align_example.py should be sufficient for a large number of cases.
+
+/src/pyjulius/alignFromTextgrid.py provides a good example of building your own custom
+alignment code (with different inputs and outputs than textgrids).  
 
 
 =========
@@ -23,9 +30,15 @@ should run fine on Windows.  Any feedback or comments would be appreciated.
 Prerequisites
 =========
 
+python - https://www.python.org/
+
 pyPraat - https://github.com/timmahrt/pyPraat
 
+ * for textgrid manipulations
+
 Julius - http://julius.sourceforge.jp/en_index.php?q=index-en.html
+
+ * the speech recognition engine
 
  * you'll also need to download the /Julius Segmentation Kit/, which is available on
    the same page.  It's not a file you "install" but something you'll want to put
@@ -33,11 +46,18 @@ Julius - http://julius.sourceforge.jp/en_index.php?q=index-en.html
 
 Sox - http://sox.sourceforge.net/
 
+ * Converts the sampling frequency of the audio if needed.
+
  * Optional.  If you choose to not install sox, you'll need to make sure your audio
    files are at the same sampling frequency as the model data (the included data is
    14khz)
+   
+ * If you forced the script to run Julius on audio that has a different sampling
+   frequency, the aligner would completely fail.
 
 Cabocha - https://code.google.com/p/cabocha/ 
+
+ * used to convert typical Japanese text into romaji/phones.
 
  * (throw it into google translate if you need it in English)
 

@@ -1,11 +1,11 @@
 
-========
+-----------
 pyJulius
-========
+-----------
 
 A python interface to Julius, the speech recognition system.
 
-The primary function right now is the Japanese forced aligner.  Given the transcript
+**The primary function right now is the Japanese forced aligner.**  Given the transcript
 for an audio file in Japanese, this series of scripts will estimate where those 
 phones were produced in the audio.
 
@@ -15,9 +15,12 @@ phones were produced in the audio.
 alignment code (with different inputs and outputs than textgrids).  
 
 
-=========
-IMPORTANT
-=========
+.. sectnum::
+.. contents::
+
+
+Important notice
+==================
 
 I have tested this on Mac OS X.  I think it should work fine on other Unix systems.
 
@@ -26,9 +29,8 @@ which I couldn't get to install.  If you can get it working, then this should co
 should run fine on Windows.  Any feedback or comments would be appreciated.
 
 
-=========
 Prerequisites
-=========
+==================
 
 python - https://www.python.org/
 
@@ -66,18 +68,22 @@ Cabocha - https://code.google.com/p/cabocha/
 Perl (for Julius)
 
 
-=========
+
 Installation
-=========
+==================
 
-In a command line navigate to the root directory and type:
+From a command-line shell, navigate to the directory this is located in 
+and type::
 
-python setup.py install
+    python setup.py install
+
+If python is not in your path, you'll need to enter the full path e.g.::
+
+    C:\Python27\python.exe setup.py install
 
 
-=========
 Testing installation
-=========
+=====================
 
 In the folder 'test' open the folder align.
 
@@ -89,9 +95,17 @@ Also, you will need to configure "segment_julius4.pl" which is a part of the
 Julius Segmentation Kit.
 
 
-=========
+Example usage
+==================
+
+Please see \\test for an example usage.  
+
+There is pretty much only one way to use this library at the moment.  
+Please contact me if you are having difficulties using this library.
+
+
 Troubleshooting
-========= 
+==================
 
 The scripts should catch any issues along the way with the exception of 
 issues stemming from Julius.  If you get bogus/null results, most likely Julius

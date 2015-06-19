@@ -8,6 +8,10 @@ This is an example that will force align a directory of wav files and
 corresponding TextGrid files.
 '''
 
+import sys
+reload(sys)
+sys.setdefaultencoding("utf-8")
+
 from os.path import join
 
 

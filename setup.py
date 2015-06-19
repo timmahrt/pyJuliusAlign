@@ -13,7 +13,7 @@ setup(name='pyJulius',
       packages=['pyjulius'],
       package_data = {'pyjulius':["hiraganaChart.txt", "katakanaChart.txt"]},
       license='LICENSE',
-      long_description=open('README.txt', 'r').read(),
+      long_description=open('README.rst', 'r').read(),
       install_requires=[
                         "pypraat", # https://github.com/timmahrt/pyPraat
                         "jNlp" # https://github.com/kevincobain2000/jProcessing

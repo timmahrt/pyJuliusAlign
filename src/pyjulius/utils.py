@@ -21,7 +21,7 @@ def _getMatchFunc(pattern):
         return fullStr[:len(subStr)] == subStr
             
     def endsWith(subStr, fullStr):
-        return fullStr[-1*len(subStr):] == subStr
+        return fullStr[-1 * len(subStr):] == subStr
     
     def inStr(subStr, fullStr):
         return subStr in fullStr
@@ -46,26 +46,25 @@ def findFiles(path, filterPaths=False, filterExt=None, filterPattern=None,
     
     fnList = os.listdir(path)
     
+    if filterPaths is True:
+        fnList = [folderName for folderName in fnList
+                  if os.path.isdir(os.path.join(path, folderName))]
     
-    if filterPaths == True:
-        fnList = [folderName for folderName in fnList if os.path.isdir(os.path.join(path, folderName))]    
-
-
-    if filterExt != None:
-        splitFNList = [[fn,] + list(os.path.splitext(fn)) for fn in fnList]
+    if filterExt is not None:
+        splitFNList = [[fn, ] + list(os.path.splitext(fn)) for fn in fnList]
         fnList = [fn for fn, name, ext in splitFNList if ext == filterExt]
-        
-        
-    if filterPattern != None:
-        splitFNList = [[fn,] + list(os.path.splitext(fn)) for fn in fnList]
+    
+    if filterPattern is not None:
+        splitFNList = [[fn, ] + list(os.path.splitext(fn)) for fn in fnList]
         matchFunc = _getMatchFunc(filterPattern)
         fnList = [fn for fn, name, ext in splitFNList if matchFunc(name)]
     
-    if skipIfNameInList != None:
+    if skipIfNameInList is not None:
         targetNameList = [os.path.splitext(fn)[0] for fn in skipIfNameInList]
-        fnList = [fn for fn in fnList if os.path.splitext(fn)[0] not in targetNameList]
+        fnList = [fn for fn in fnList
+                  if os.path.splitext(fn)[0] not in targetNameList]
     
-    if stripExt == True:
+    if stripExt is True:
         fnList = [os.path.splitext(fn)[0] for fn in fnList]
     
     fnList.sort()
@@ -85,6 +84,3 @@ def divide(numerator, denominator, zeroValue):
         retValue = numerator / float(denominator)
         
     return retValue
-
-
-

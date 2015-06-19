@@ -4,7 +4,7 @@ Created on Aug 31, 2014
 
 @author: tmahrt
 
-This is an example that will force align a directory of wav files and 
+This is an example that will force align a directory of wav files and
 corresponding TextGrid files.
 '''
 
@@ -21,17 +21,16 @@ juliusScriptPath = "/Users/tmahrt/Documents/julius4-segmentation-kit-v1.0"
 soxPath = "/opt/local/bin/sox"
 cabochaPath = "/usr/local/bin/cabocha"
 
-alignFromTextgrid.textgridToCSV(inputPath=path, 
+alignFromTextgrid.textgridToCSV(inputPath=path,
                                 outputPath=path)
 
-alignFromTextgrid.convertCorpusToKanaAndRomaji(inputPath=path, 
-                                               outputPath=cabochaOutput, 
+alignFromTextgrid.convertCorpusToKanaAndRomaji(inputPath=path,
+                                               outputPath=cabochaOutput,
                                                cabochaEncoding="euc-jp",
                                                cabochaPath=cabochaPath,
                                                encoding="utf-8")
 
-alignFromTextgrid.forceAlignCorpus(wavPath=path, txtPath=cabochaOutput, 
+alignFromTextgrid.forceAlignCorpus(wavPath=path, txtPath=cabochaOutput,
                                    outputPath=alignedOutput,
                                    juliusScriptPath=juliusScriptPath,
                                    soxPath=soxPath)
-

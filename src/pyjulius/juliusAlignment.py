@@ -22,10 +22,12 @@ UTTERANCE = "utterances"
 class JuliusRunError(Exception):
 
     def __init__(self, juliusPath):
+        super(JuliusRunError, self).__init__()
         self.path = juliusPath
 
     def __str__(self):
-        return "Tried to run julius at location but it does not exist: \n%s" % self.path
+        return ("Tried to run julius at location but it does not exist: \n%s"
+                % self.path)
 
     
 class JuliusAlignmentError(Exception):
@@ -42,9 +44,9 @@ def runJuliusAlignment(wavFN, transFN, juliusScriptPath):
     
     argList = ["perl", juliusScript, wavFN, transFN]
     
-#     print " ".join(argList)
     nullFD = open(os.devnull, "w")
-    subprocess.call(argList, stdout=nullFD, stderr=open("julius_error.txt", "w"))
+    subprocess.call(argList, stdout=nullFD,
+                    stderr=open("julius_error.txt", "w"))
 
 
 def parseJuliusOutput(juliusOutputFN):
@@ -66,10 +68,11 @@ def parseJuliusOutput(juliusOutputFN):
         except ValueError:
             break
         
-        matchList.append(output[start+1:end])
+        matchList.append(output[start + 1:end])
         start = end
         
-    matchList = [[float(value.strip()) for value in row.split()] for row in matchList]
+    matchList = [[float(value.strip()) for value in row.split()]
+                 for row in matchList]
 
     return matchList
 
@@ -98,19 +101,28 @@ def juliusAlignCabocha(dataList, wavPath, wavFN, juliusScriptPath, soxPath,
     numPhonesFailedToAlign = 0
     numIntervals = 0
     numFailedIntervals = 0
-    for intervalStart, intervalEnd, line, wordList, kanaList, romajiList in dataList:
-
+    # intervalStart, intervalEnd, line, wordList, kanaList, romajiList
+    for rowTuple in dataList:
+        intervalStart = rowTuple[0]
+        intervalEnd = rowTuple[1]
+        line = rowTuple[2]
+        wordList = rowTuple[3]
+        romajiList = rowTuple[5]
+        
         if line.strip() != "":
-            entryDict[UTTERANCE].append( (str(intervalStart), str(intervalEnd), line))            
+            entryDict[UTTERANCE].append((str(intervalStart),
+                                         str(intervalEnd),
+                                         line))
         
         if len([word for word in wordList if word != '']) == 0:
             continue
         
-        assert(intervalStart < intervalEnd) 
+        assert(intervalStart < intervalEnd)
         
-        # Create romajiTxt (for forced alignment) and 
+        # Create romajiTxt (for forced alignment) and
         # phoneList (for the textgrid)
-        tmpRomajiList = [row.split(" ") for row in romajiList] # Phones broken up by word
+        # Phones broken up by word
+        tmpRomajiList = [row.split(" ") for row in romajiList]
         numPhones = len(tmpRomajiList)
         wordTimeList = [[] for i in xrange(len(wordList))]
         phoneToWordIndexList = []
@@ -133,8 +145,9 @@ def juliusAlignCabocha(dataList, wavPath, wavFN, juliusScriptPath, soxPath,
         # Save temporary transcript and wav files for interval
         open(tmpTxtFN, "w").write(romajiTxt)
                 
-        audioScripts.extractSubwav(join(wavPath, wavFN), tmpWavFN, 
-                                   intervalStart, intervalEnd, singleChannelFlag=False,
+        audioScripts.extractSubwav(join(wavPath, wavFN), tmpWavFN,
+                                   intervalStart, intervalEnd,
+                                   singleChannelFlag=False,
                                    soxPath=soxPath)
         
         # Run forced alignment
@@ -145,12 +158,14 @@ def juliusAlignCabocha(dataList, wavPath, wavFN, juliusScriptPath, soxPath,
         try:
             matchList = parseJuliusOutput(tmpOutputFN)
         except JuliusAlignmentError:
-            if forceMonophoneAlignFlag == True and numPhones == 1:
-                matchList = [(0.0, (intervalEnd-intervalStart)*100) ] # One phone occupies the whole interval
-            else: 
+            if forceMonophoneAlignFlag is True and numPhones == 1:
+                # One phone occupies the whole interval
+                matchList = [(0.0, (intervalEnd - intervalStart) * 100)]
+            else:
                 numPhonesFailedToAlign += numPhones
                 numFailedIntervals += 1
-                print "Failed to align: ", romajiList, intervalStart, intervalEnd
+                print("Failed to align: %s - %f - %f" %
+                      ("".join(romajiList), intervalStart, intervalEnd))
                 continue
         
         # Store the phones
@@ -161,21 +176,21 @@ def juliusAlignCabocha(dataList, wavPath, wavFN, juliusScriptPath, soxPath,
             start, stop = timeList
             assert(float(start) < float(stop))
             
-            phoneStartTime = intervalStart + streamStart*0.01
-            phoneStopTime = intervalStart + stop*0.01 
+            phoneStartTime = intervalStart + streamStart * 0.01
+            phoneStopTime = intervalStart + stop * 0.01
             
             # Julius is conservative in estimating the final vowel.  Stretch it
             # to be the length of the utterance
-            if forceEndTimeFlag == True and i+1 == len(matchList):
+            if forceEndTimeFlag is True and i + 1 == len(matchList):
                 phoneStopTime = intervalEnd
             
             # Store the phone here
             assert(float(phoneStartTime) < float(phoneStopTime))
-            entryDict[PHONE].append( (phoneStartTime, phoneStopTime, label) )
+            entryDict[PHONE].append((phoneStartTime, phoneStopTime, label))
             
             # Use those same phone times in determining the word time later
             j = phoneToWordIndexList[i]
-            wordTimeList[j].extend( [phoneStartTime, phoneStopTime] )
+            wordTimeList[j].extend([phoneStartTime, phoneStopTime])
             
             # Next iteration
             streamStart = stop
@@ -185,11 +200,13 @@ def juliusAlignCabocha(dataList, wavPath, wavFN, juliusScriptPath, soxPath,
         for i in xrange(len(wordList)):
             assert(len(wordTimeList[i]) != 0)
             
-            entryDict[WORD].append( (min(wordTimeList[i]), max(wordTimeList[i]), wordList[i]) ) 
+            entryDict[WORD].append((min(wordTimeList[i]), max(wordTimeList[i]),
+                                    wordList[i]))
 
         numTotalPhones += numPhones
     
-    statList = [numPhonesFailedToAlign, numTotalPhones, numFailedIntervals, numIntervals]
+    statList = [numPhonesFailedToAlign, numTotalPhones,
+                numFailedIntervals, numIntervals]
     return entryDict, statList
 
 
@@ -202,9 +219,9 @@ def prepData(line, cabochaEncoding, cabochaPath):
     
     # Clean up the line before it gets processed
     # Not sure what "・" is but cabocha doesn't like it
-    for char in [u"（", u"）", u" ", u"．", u"？", u"「", u"」", 
+    for char in [u"（", u"）", u" ", u"．", u"？", u"「", u"」",
                  u"［", u"］", u"＠Ｗ", u"＠Ｓ", u"＜", u"＞", u" ", u"。"]:
-        line = line.replace(char, "")    
+        line = line.replace(char, "")
     
     # Used to split names?
     for char in [u"・", u"·"]:
@@ -213,35 +230,35 @@ def prepData(line, cabochaEncoding, cabochaPath):
     line = line.strip()
     
     try:
-        tmpWordList, tmpKanaList, tmpRomajiList = jProcessingSnippet.getChunkedKana(line, cabochaEncoding, cabochaPath)
+        (tmpWordList, tmpKanaList,
+         tmpRomajiList) = jProcessingSnippet.getChunkedKana(line,
+                                                            cabochaEncoding,
+                                                            cabochaPath)
     except (jProcessingSnippet.ChunkingError,
             jProcessingSnippet.NonKatakanaError), e:
-        print u"%s" % str(e), origLine
+        print(u"%s, %s" % (str(e), origLine))
         tmpWordList = [""]
         tmpKanaList = [""]
         tmpRomajiList = [""]
         unidentifiedUtterance = 1
     except jProcessingSnippet.UnidentifiedJapaneseText, e:
-        if all([char == u"X" for char in e.word]): # Maybe specific to my corpus?
-#             print "Skipping un-named entity:", e.sentence
+        # Maybe specific to my corpus?
+        if all([char == u"X" for char in e.word]):
             unnamedEntity = 1
         else:
-            print u"%s" % str(e)
+            print(u"%s" % str(e))
             unidentifiedUtterance = 1
         tmpWordList = [""]
         tmpKanaList = [""]
         tmpRomajiList = [""]
     except jProcessingSnippet.EmptyStrError, e:
-    #                 print u"%s" % str(e), origLine
         tmpWordList = [""]
         tmpKanaList = [""]
         tmpRomajiList = [""]
     except Exception:
-        print line
+        print(line)
         raise
     line = line.replace(u",", u"")
     
-    return line, ",".join(tmpWordList), ",".join(tmpKanaList), ",".join(tmpRomajiList), unidentifiedUtterance, unnamedEntity
-
-    
-    
+    return (line, ",".join(tmpWordList), ",".join(tmpKanaList),
+            ",".join(tmpRomajiList), unidentifiedUtterance, unnamedEntity)

@@ -9,13 +9,12 @@ setup(name='pyJulius',
       version='1.0.0',
       author='Tim Mahrt',
       author_email='timmahrt@gmail.com',
-      package_dir={'pyjulius':os.path.join('src', "pyjulius")},
+      package_dir={'pyjulius': os.path.join('src', "pyjulius")},
       packages=['pyjulius'],
-      package_data = {'pyjulius':["hiraganaChart.txt", "katakanaChart.txt"]},
+      package_data={'pyjulius': ["hiraganaChart.txt", "katakanaChart.txt"]},
       license='LICENSE',
       long_description=open('README.rst', 'r').read(),
-      install_requires=[
-                        "pypraat", # https://github.com/timmahrt/pyPraat
-                        "jNlp" # https://github.com/kevincobain2000/jProcessing
-                        ],    
+      requires=["praatio (>=2.1.0)",  # https://github.com/timmahrt/praatIO
+                "jNlp"  # https://github.com/kevincobain2000/jProcessing
+                ],
       )

@@ -3,6 +3,9 @@
 pyJulius
 -----------
 
+.. image:: https://img.shields.io/badge/license-MIT-blue.svg?
+   :target: http://opensource.org/licenses/MIT
+
 A python interface to Julius, the speech recognition system.
 
 **The primary function right now is the Japanese forced aligner.**  Given the transcript

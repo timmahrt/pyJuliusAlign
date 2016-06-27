@@ -38,7 +38,8 @@ def parseChart(chartFN):
     @setrofim : http://www.python-forum.
      org/pythonforum/viewtopic.php?f=3&t=31935
     """
-    chart = codecs.open(chartFN, "r", encoding="utf-8").read()
+    with codecs.open(chartFN, "r", encoding="utf-8") as fd:
+        chart = fd.read()
     
     lines = chart.split('\n')
     chartDict = {}

@@ -35,8 +35,9 @@ def textgridToCSV(inputPath, outputPath):
         
         name = os.path.splitext(fn)[0]
         outputTxt = "\n".join(outputList)
-        codecs.open(join(outputPath, "%s.csv" % name),
-                    "w", encoding="utf-8").write(outputTxt)
+        outputFN = join(outputPath, "%s.csv" % name)
+        with codecs.open(outputFN, "w", encoding="utf-8") as fd:
+            fd.write(outputTxt)
 
 
 def convertCorpusToKanaAndRomaji(inputPath, outputPath, cabochaEncoding,
@@ -55,7 +56,8 @@ def convertCorpusToKanaAndRomaji(inputPath, outputPath, cabochaEncoding,
     for fn in utils.findFiles(inputPath, filterExt=".csv",
                               skipIfNameInList=finishedList):
         print(fn)
-        text = codecs.open(join(inputPath, fn), "rU", encoding=encoding).read()
+        with codecs.open(join(inputPath, fn), "rU", encoding=encoding) as fd:
+            text = fd.read()
         textList = text.split("\n")
         
         numUnnamedEntitiesForFN = 0
@@ -95,8 +97,8 @@ def convertCorpusToKanaAndRomaji(inputPath, outputPath, cabochaEncoding,
         numUnnamedEntities += numUnnamedEntitiesForFN
         numUnidentifiedUtterances += numUnidentifiedUtterancesForFN
 
-        codecs.open(join(outputPath, fn), "w",
-                    encoding="utf-8").write("\n".join(speakerInfoList))
+        with codecs.open(join(outputPath, fn), "w", encoding="utf-8") as fd:
+            fd.write("\n".join(speakerInfoList))
      
     print("\n")
     print("Number of unnamed entities: %d" % numUnnamedEntities)
@@ -122,7 +124,8 @@ def forceAlignFile(speakerList, wavPath, wavNameDict, txtPath, txtFN,
     utils.makeDir(outputPath)
     
     # Formatted output of cabocha
-    data = codecs.open(join(txtPath, txtFN), "r", encoding="utf-8").read()
+    with codecs.open(join(txtPath, txtFN), "r", encoding="utf-8") as fd:
+        data = fd.read()
     dataList = data.split("\n")
     dataList = [[subRow.split(",") for subRow in row.split(";")]
                 for row in dataList if row != ""]

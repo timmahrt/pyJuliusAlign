@@ -38,11 +38,10 @@ class JuliusAlignmentError(Exception):
 
 def runJuliusAlignment(wavFN, transFN, juliusScriptPath):
     
-    juliusScript = join(juliusScriptPath, "segment_julius4.pl")
-    if not os.path.exists(juliusScript):
-        raise JuliusRunError(juliusScript)
+    if not os.path.exists(juliusScriptPath):
+        raise JuliusRunError(juliusScriptPath)
     
-    argList = ["perl", juliusScript, wavFN, transFN]
+    argList = ["perl", juliusScriptPath, wavFN, transFN]
     
     nullFD = open(os.devnull, "w")
     subprocess.call(argList, stdout=nullFD,
@@ -51,7 +50,8 @@ def runJuliusAlignment(wavFN, transFN, juliusScriptPath):
 
 def parseJuliusOutput(juliusOutputFN):
     '''Parse the output of julius'''
-    output = open(juliusOutputFN, "r").read()
+    with open(juliusOutputFN, "r") as fd:
+        output = fd.read()
     try:
         output = output.split("----------------------------------------")[1]
     except IndexError:
@@ -124,10 +124,10 @@ def juliusAlignCabocha(dataList, wavPath, wavFN, juliusScriptPath, soxPath,
         # Phones broken up by word
         tmpRomajiList = [row.split(" ") for row in romajiList]
         numPhones = len(tmpRomajiList)
-        wordTimeList = [[] for i in xrange(len(wordList))]
+        wordTimeList = [[] for i in range(len(wordList))]
         phoneToWordIndexList = []
-        for i in xrange(numPhones):
-            for j in xrange(len(tmpRomajiList[i])):
+        for i in range(numPhones):
+            for j in range(len(tmpRomajiList[i])):
                 phoneToWordIndexList.append(i)
         
         romajiTxt = " ".join(romajiList)
@@ -143,7 +143,8 @@ def juliusAlignCabocha(dataList, wavPath, wavFN, juliusScriptPath, soxPath,
             romajiTxt = "silB " + romajiTxt + " silE"
         
         # Save temporary transcript and wav files for interval
-        open(tmpTxtFN, "w").write(romajiTxt)
+        with open(tmpTxtFN, "w") as fd:
+            fd.write(romajiTxt)
                 
         audioScripts.extractSubwav(join(wavPath, wavFN), tmpWavFN,
                                    intervalStart, intervalEnd,
@@ -197,7 +198,7 @@ def juliusAlignCabocha(dataList, wavPath, wavFN, juliusScriptPath, soxPath,
             i += 1
     
         # Store the words
-        for i in xrange(len(wordList)):
+        for i in range(len(wordList)):
             assert(len(wordTimeList[i]) != 0)
             
             entryDict[WORD].append((min(wordTimeList[i]), max(wordTimeList[i]),

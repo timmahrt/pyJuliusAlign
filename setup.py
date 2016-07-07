@@ -6,6 +6,7 @@ Created on Aug 29, 2014
 @author: tmahrt
 '''
 import os
+import codecs
 from distutils.core import setup
 setup(name='pyJulius',
       version='1.0.0',
@@ -15,7 +16,7 @@ setup(name='pyJulius',
       packages=['pyjulius'],
       package_data={'pyjulius': ["hiraganaChart.txt", "katakanaChart.txt"]},
       license='LICENSE',
-      long_description=open('README.rst', 'r').read(),
+      long_description=codecs.open('README.rst', 'r', encoding="utf-8").read(),
       requires=["praatio (>=2.1.0)",  # https://github.com/timmahrt/praatIO
                 "jNlp"  # https://github.com/kevincobain2000/jProcessing
                 ],

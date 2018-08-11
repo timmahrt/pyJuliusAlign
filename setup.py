@@ -5,19 +5,19 @@ Created on Aug 29, 2014
 
 @author: tmahrt
 '''
-import os
+from setuptools import setup
 import io
-from distutils.core import setup
-setup(name='pyJulius',
-      version='1.0.0',
+import os
+setup(name='pyjulius',
+      version='1.1.0',
       author='Tim Mahrt',
       author_email='timmahrt@gmail.com',
-      package_dir={'pyjulius': os.path.join('src', "pyjulius")},
+      url='https://github.com/timmahrt/pyJulius',
+      package_dir={'pyjulius':os.path.join('src', 'pyjulius')},
       packages=['pyjulius'],
       package_data={'pyjulius': ["hiraganaChart.txt", "katakanaChart.txt"]},
       license='LICENSE',
+      description='A helper library for doing forced-alignment in Japanese with Julius.',
       long_description=io.open('README.rst', 'r', encoding="utf-8").read(),
-      requires=["praatio (>=2.1.0)",  # https://github.com/timmahrt/praatIO
-                "jNlp"  # https://github.com/kevincobain2000/jProcessing
-                ],
+#       install_requires=[], # No requirements! # requires 'from setuptools import setup'
       )

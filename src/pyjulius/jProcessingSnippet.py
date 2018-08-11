@@ -205,7 +205,12 @@ def cabocha(sentence, cabochaEncoding, cabochaPath=None):
     output = process.communicate()[0]
     os.unlink(temp.name)
     
-    return unicode(output, cabochaEncoding)
+    try:
+        retStr = unicode(output, cabochaEncoding)
+    except NameError:  # unicode() does not exist in python 3
+        retStr = str(output, cabochaEncoding)
+        
+    return retStr
 
 
 def jReads(target_sent, cabochaEncoding, cabochaPath):
@@ -221,8 +226,9 @@ def jReads(target_sent, cabochaEncoding, cabochaPath):
     retJReadsToks = []
     retWordList = []
     
+    keyList = list(kataToRomajiDict.keys())
     validKatakanaList = [u"ャ", u"ュ", u"ョ", u"ッ", u"ァ", u"ィ",
-                         u"ゥ", u"ェ", u"ォ", u"ー", ] + kataToRomajiDict.keys()
+                         u"ゥ", u"ェ", u"ォ", u"ー", ] + keyList
 #     validHiraganaList = [u"ゃ", u"ゅ", u"ょ", u"っ"] + kanaToRomajiDict.keys()
     for chunk in sentence:
         jReadsToks = []

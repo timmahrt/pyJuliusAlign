@@ -165,7 +165,7 @@ def forceAlignFile(speakerList, wavPath, wavNameDict, txtPath, txtFN,
         numIntervals += statList[3]
 
     # All durations should be the same
-    inputWavFN = wavNameDict.values()[0]
+    inputWavFN = next(iter(wavNameDict.values()))
     maxDuration = audioScripts.getSoundFileDuration(join(wavPath, inputWavFN))
 
     # Create tiers and textgrids from the output of the alignment

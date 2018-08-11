@@ -237,13 +237,13 @@ def prepData(line, cabochaEncoding, cabochaPath):
                                                             cabochaEncoding,
                                                             cabochaPath)
     except (jProcessingSnippet.ChunkingError,
-            jProcessingSnippet.NonKatakanaError), e:
+            jProcessingSnippet.NonKatakanaError) as e:
         print(u"%s, %s" % (str(e), origLine))
         tmpWordList = [""]
         tmpKanaList = [""]
         tmpRomajiList = [""]
         unidentifiedUtterance = 1
-    except jProcessingSnippet.UnidentifiedJapaneseText, e:
+    except jProcessingSnippet.UnidentifiedJapaneseText as e:
         # Maybe specific to my corpus?
         if all([char == u"X" for char in e.word]):
             unnamedEntity = 1
@@ -253,7 +253,7 @@ def prepData(line, cabochaEncoding, cabochaPath):
         tmpWordList = [""]
         tmpKanaList = [""]
         tmpRomajiList = [""]
-    except jProcessingSnippet.EmptyStrError, e:
+    except jProcessingSnippet.EmptyStrError as e:
         tmpWordList = [""]
         tmpKanaList = [""]
         tmpRomajiList = [""]

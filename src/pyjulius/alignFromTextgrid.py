@@ -177,8 +177,8 @@ def forceAlignFile(speakerList, wavPath, wavNameDict, txtPath, txtFN,
             tierName = "%s_%s" % (aspect, speaker)
 
             tier = tgio.IntervalTier(tierName,
-                                        speakerEntryDict[speaker][aspect],
-                                        minT=0, maxT=maxDuration)
+                                     speakerEntryDict[speaker][aspect],
+                                     minT=0, maxT=maxDuration)
             tg.addTier(tier)
     
     tg.save(join(outputPath, outputWavName + ".TextGrid"))

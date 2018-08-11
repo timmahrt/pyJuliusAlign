@@ -36,12 +36,12 @@ class JuliusAlignmentError(Exception):
         return "Failed to align: "
 
 
-def runJuliusAlignment(wavFN, transFN, juliusScriptPath):
+def runJuliusAlignment(wavFN, transFN, juliusScriptPath, perlPath):
     
     if not os.path.exists(juliusScriptPath):
         raise JuliusRunError(juliusScriptPath)
     
-    argList = ["perl", juliusScriptPath, wavFN, transFN]
+    argList = [perlPath, juliusScriptPath, wavFN, transFN]
     
     nullFD = open(os.devnull, "w")
     subprocess.call(argList, stdout=nullFD,
@@ -78,7 +78,8 @@ def parseJuliusOutput(juliusOutputFN):
 
 
 def juliusAlignCabocha(dataList, wavPath, wavFN, juliusScriptPath, soxPath,
-                       silenceFlag, forceEndTimeFlag, forceMonophoneAlignFlag):
+                       perlPath, silenceFlag, forceEndTimeFlag,
+                       forceMonophoneAlignFlag):
     '''
     Given utterance-level timing and a wav file, phone-align the audio
     
@@ -152,7 +153,7 @@ def juliusAlignCabocha(dataList, wavPath, wavFN, juliusScriptPath, soxPath,
                                    soxPath=soxPath)
         
         # Run forced alignment
-        runJuliusAlignment(tmpWavFN, tmpTxtFN, juliusScriptPath)
+        runJuliusAlignment(tmpWavFN, tmpTxtFN, juliusScriptPath, perlPath)
         
         # Get the output (timestamps for each phone)
         numIntervals += 1

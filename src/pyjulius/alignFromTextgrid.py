@@ -107,7 +107,8 @@ def convertCorpusToKanaAndRomaji(inputPath, outputPath, cabochaEncoding,
 
 
 def forceAlignFile(speakerList, wavPath, wavNameDict, txtPath, txtFN,
-                   outputPath, outputWavName, juliusScriptPath, soxPath):
+                   outputPath, outputWavName, juliusScriptPath, soxPath,
+                   perlPath):
     '''
     
     Normally:
@@ -154,7 +155,7 @@ def forceAlignFile(speakerList, wavPath, wavNameDict, txtPath, txtFN,
         output = juliusAlignment.juliusAlignCabocha(dataDict[speaker], wavPath,
                                                     wavNameDict[speaker],
                                                     juliusScriptPath, soxPath,
-                                                    False, True, True)
+                                                    perlPath, False, True, True)
         
         speakerEntryDict[speaker], statList = output
         
@@ -187,7 +188,7 @@ def forceAlignFile(speakerList, wavPath, wavNameDict, txtPath, txtFN,
 
 
 def forceAlignCorpus(wavPath, txtPath, outputPath, juliusScriptPath=None,
-                     soxPath=None):
+                     soxPath=None, perlPath=None):
     '''Force aligns every file and prints out summary statistics'''
     totalNumPhonesFailed = 0
     totalNumPhones = 0
@@ -204,7 +205,7 @@ def forceAlignCorpus(wavPath, txtPath, outputPath, juliusScriptPath=None,
         wavNameDict = {name: "%s.wav" % name}
         output = forceAlignFile([name, ], wavPath, wavNameDict, txtPath,
                                 name + ".csv", outputPath, name,
-                                juliusScriptPath, soxPath)
+                                juliusScriptPath, soxPath, perlPath)
 
         (numPhonesFailedAlignment, numPhones,
          numFailedIntervals, numIntervals) = output

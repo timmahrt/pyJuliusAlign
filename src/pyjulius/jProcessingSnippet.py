@@ -18,7 +18,7 @@ All other code is from me
 
 import os
 from os.path import join
-import codecs
+import io
 import subprocess
 import tempfile
 
@@ -38,7 +38,7 @@ def parseChart(chartFN):
     @setrofim : http://www.python-forum.
      org/pythonforum/viewtopic.php?f=3&t=31935
     """
-    with codecs.open(chartFN, "r", encoding="utf-8") as fd:
+    with io.open(chartFN, "r", encoding="utf-8") as fd:
         chart = fd.read()
     
     lines = chart.split('\n')

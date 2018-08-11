@@ -12,7 +12,7 @@ you may find these functions useful.
 
 import os
 from os.path import join
-import codecs
+import io
 
 from pyjulius import utils
 from pyjulius import juliusAlignment
@@ -36,7 +36,7 @@ def textgridToCSV(inputPath, outputPath):
         name = os.path.splitext(fn)[0]
         outputTxt = "\n".join(outputList)
         outputFN = join(outputPath, "%s.csv" % name)
-        with codecs.open(outputFN, "w", encoding="utf-8") as fd:
+        with io.open(outputFN, "w", encoding="utf-8") as fd:
             fd.write(outputTxt)
 
 
@@ -56,7 +56,7 @@ def convertCorpusToKanaAndRomaji(inputPath, outputPath, cabochaEncoding,
     for fn in utils.findFiles(inputPath, filterExt=".csv",
                               skipIfNameInList=finishedList):
         print(fn)
-        with codecs.open(join(inputPath, fn), "rU", encoding=encoding) as fd:
+        with io.open(join(inputPath, fn), "rU", encoding=encoding) as fd:
             text = fd.read()
         textList = text.split("\n")
         
@@ -97,7 +97,7 @@ def convertCorpusToKanaAndRomaji(inputPath, outputPath, cabochaEncoding,
         numUnnamedEntities += numUnnamedEntitiesForFN
         numUnidentifiedUtterances += numUnidentifiedUtterancesForFN
 
-        with codecs.open(join(outputPath, fn), "w", encoding="utf-8") as fd:
+        with io.open(join(outputPath, fn), "w", encoding="utf-8") as fd:
             fd.write("\n".join(speakerInfoList))
      
     print("\n")
@@ -124,7 +124,7 @@ def forceAlignFile(speakerList, wavPath, wavNameDict, txtPath, txtFN,
     utils.makeDir(outputPath)
     
     # Formatted output of cabocha
-    with codecs.open(join(txtPath, txtFN), "r", encoding="utf-8") as fd:
+    with io.open(join(txtPath, txtFN), "r", encoding="utf-8") as fd:
         data = fd.read()
     dataList = data.split("\n")
     dataList = [[subRow.split(",") for subRow in row.split(";")]

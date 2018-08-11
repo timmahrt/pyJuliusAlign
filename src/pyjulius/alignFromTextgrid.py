@@ -25,9 +25,10 @@ def textgridToCSV(inputPath, outputPath):
     utils.makeDir(outputPath)
     
     existsFNList = utils.findFiles(outputPath, filterExt=".csv")
+    
     for fn in utils.findFiles(inputPath, filterExt=".TextGrid",
                               skipIfNameInList=existsFNList):
-        tg = tgio.openTextGrid(join(inputPath, fn))
+        tg = tgio.openTextgrid(join(inputPath, fn))
         tier = tg.tierDict["utterances"]
         outputList = []
         for start, stop, label in tier.entryList:

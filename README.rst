@@ -53,13 +53,12 @@ Julius new version vs old version
 ==================================
 
 Around 2015, Julius was moved to github (https://github.com/julius-speech/segmentation-kit).
-I have not tried this version yet.  There is also a new version of the Julius Segmentation Kit with
-a new script (segment_julius.pl).  It will not work.  For the moment, please use segment_julius4.pl
-supplied with the older code.
+I have not tried this version yet.  There is also a new version of the Julius Segmentation
+Kit with a new script (segment_julius.pl).  It works differently than the similarly named 
+segment_julius4.pl with different inputs and outputs.  For the moment,
+please use segment_julius4.pl supplied with the older code.
 
 With the file segment_julius4.pl you'll need to change line 69 to `push(@words, $_);`
-
-Please do not use segment_julius.pl which is available on the newer github site.
 
 
 Major revisions

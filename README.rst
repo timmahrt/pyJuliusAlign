@@ -6,6 +6,12 @@ pyJuliusAlign
 .. image:: https://img.shields.io/badge/license-MIT-blue.svg?
    :target: http://opensource.org/licenses/MIT
 
+*Questions?  Comments?  Feedback?  Chat with us on gitter!*
+
+.. image:: https://badges.gitter.im/pyJuliusAlign/Lobby.svg?
+   :alt: Join the chat at https://gitter.im/pyJuliusAlign/Lobby
+   :target: https://gitter.im/pyJuliusAlign/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
+
 A python interface to Julius, the speech recognition system.
 
 **The primary function right now is the Japanese forced aligner.**  Given the transcript

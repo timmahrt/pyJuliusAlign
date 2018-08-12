@@ -18,7 +18,8 @@ phones were produced in the audio.
 alignment code (with different inputs and outputs than textgrids).  
 
 
-Here is a cropped view of the before and after output file in the example files
+Here is a cropped view of the before and after output file in the example files:
+
 .. image:: test/files/pyjulius_example.png
    :width: 500px
 
@@ -44,7 +45,7 @@ Julius new version vs old version
 ==================================
 
 Around 2015, Julius was moved to github (https://github.com/julius-speech/segmentation-kit).
-I have not tried this version yet.  There is a new version of the Julius Segmentation Kit with
+I have not tried this version yet.  There is also a new version of the Julius Segmentation Kit with
 a new script (segment_julius.pl).  It will not work.  For the moment, please use segment_julius4.pl
 supplied with the older code.
 

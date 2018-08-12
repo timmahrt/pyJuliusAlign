@@ -1,6 +1,6 @@
 
 -----------
-pyJulius
+pyJuliusAlign
 -----------
 
 .. image:: https://img.shields.io/badge/license-MIT-blue.svg?
@@ -12,9 +12,9 @@ A python interface to Julius, the speech recognition system.
 for an audio file in Japanese, this series of scripts will estimate where those 
 phones were produced in the audio.
 
-/test/align_example.py should be sufficient for a large number of cases.
+/examples/align_example.py should be sufficient for a large number of cases.
 
-/src/pyjulius/alignFromTextgrid.py provides a good example of building your own custom
+/pyjuliusalign/alignFromTextgrid.py provides a good example of building your own custom
 alignment code (with different inputs and outputs than textgrids).  
 
 
@@ -110,14 +110,17 @@ Perl (for Julius)
 Installation
 ==================
 
-From a command-line shell, navigate to the directory this is located in 
-and type::
+PyJuliusAlign is on pypi and can be installed or upgraded from the command-line shell with pip like so::
+
+    pip install pyjuliusalign --upgrade
+
+Otherwise, to manually install, after downloading the source from github, from a command-line shell, navigate to the directory containing setup.py and type::
 
     python setup.py install
 
 If python is not in your path, you'll need to enter the full path e.g.::
 
-    C:\Python27\python.exe setup.py install
+	C:\Python27\python.exe setup.py install
 
 
 Testing installation
@@ -140,9 +143,9 @@ github will not work.  Please use the version available on the old julius websit
 Example usage
 ==================
 
-Please see \\test for an example usage.  
+Please see /examples for an example usage.
 
-There is pretty much only one way to use this library at the moment.  
+There is pretty much only one way to use this library at the moment.
 Please contact me if you are having difficulties using this library.
 
 

@@ -14,9 +14,9 @@ import os
 from os.path import join
 import io
 
-from pyjulius import utils
-from pyjulius import juliusAlignment
-from pyjulius import audioScripts
+from pyjuliusalign import utils
+from pyjuliusalign import juliusAlignment
+from pyjuliusalign import audioScripts
 
 from praatio import tgio
 

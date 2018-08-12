@@ -1,0 +1,82 @@
+File type = "ooTextFile"
+Object class = "TextGrid"
+
+xmin = 0 
+xmax = 17.516375 
+tiers? <exists> 
+size = 1 
+item []: 
+    item [1]:
+        class = "IntervalTier" 
+        name = "utterances" 
+        xmin = 0 
+        xmax = 17.516375 
+        intervals: size = 17 
+        intervals [1]:
+            xmin = 0 
+            xmax = 0.18147071657902195 
+            text = "" 
+        intervals [2]:
+            xmin = 0.18147071657902195 
+            xmax = 0.6879159937492599 
+            text = "こんにちは" 
+        intervals [3]:
+            xmin = 0.6879159937492599 
+            xmax = 1.305966459679748 
+            text = "" 
+        intervals [4]:
+            xmin = 1.305966459679748 
+            xmax = 3.32877817967443 
+            text = "私は、ティム·マートです" 
+        intervals [5]:
+            xmin = 3.32877817967443 
+            xmax = 3.934722740049523 
+            text = "" 
+        intervals [6]:
+            xmin = 3.934722740049523 
+            xmax = 5.338964785850873 
+            text = "私は学生です" 
+        intervals [7]:
+            xmin = 5.338964785850873 
+            xmax = 6.047979040576486 
+            text = "" 
+        intervals [8]:
+            xmin = 6.047979040576486 
+            xmax = 7.676486599865303 
+            text = "日本語を勉強します。" 
+        intervals [9]:
+            xmin = 7.676486599865303 
+            xmax = 8.033552704870546 
+            text = "" 
+        intervals [10]:
+            xmin = 8.033552704870546 
+            xmax = 10.276202636914745 
+            text = "この夏は日本にいきました" 
+        intervals [11]:
+            xmin = 10.276202636914745 
+            xmax = 10.844192385595038 
+            text = "" 
+        intervals [12]:
+            xmin = 10.844192385595038 
+            xmax = 13.73536840854227 
+            text = "東京行きましたも四国行きました" 
+        intervals [13]:
+            xmin = 13.73536840854227 
+            xmax = 14.348019879774444 
+            text = "" 
+        intervals [14]:
+            xmin = 14.348019879774444 
+            xmax = 15.186091973023565 
+            text = "楽しかった" 
+        intervals [15]:
+            xmin = 15.186091973023565 
+            xmax = 15.946147839441144 
+            text = "" 
+        intervals [16]:
+            xmin = 15.946147839441144 
+            xmax = 17.45399653706149 
+            text = "ラーメン大好きです" 
+        intervals [17]:
+            xmin = 17.45399653706149 
+            xmax = 17.516375 
+            text = "" 

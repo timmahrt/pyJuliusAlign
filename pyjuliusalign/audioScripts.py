@@ -10,7 +10,7 @@ from os.path import join
 import wave
 import audioop
 
-from pyjulius import utils
+from pyjuliusalign import utils
 
 # The default framerate in Julius
 DEFAULT_FRAMERATE = 16000

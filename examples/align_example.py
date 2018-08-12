@@ -10,7 +10,7 @@ corresponding TextGrid files.
 
 from os.path import join
 
-from pyjulius import alignFromTextgrid
+from pyjuliusalign import alignFromTextgrid
 
 
 path = join(".", "files")

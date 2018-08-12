@@ -20,7 +20,7 @@ alignment code (with different inputs and outputs than textgrids).
 
 Here is a cropped view of the before and after output file in the example files:
 
-.. image:: test/files/pyjulius_example.png
+.. image:: examples/files/pyjulius_example.png
    :width: 500px
 
 .. sectnum::
@@ -123,13 +123,13 @@ If python is not in your path, you'll need to enter the full path e.g.::
 Testing installation
 =====================
 
-In the folder 'test' open the folder align.
+In the folder 'examples' run the file 'align_example.py'.
 
 If sox, cabocha, julius, and perl are all in your path, you won't need
 to specify them in any of the arguments--leave them with your default values.
 Otherwise, you'll need to specify the full path of their bin/executable files.
 
-If you have difficulties running it without specifying the full path, try using the
+If you have difficulties running the code without specifying the full path, try using the
 full paths anyways.
 
 Also, you will need to configure "segment_julius4.pl" which is a part of the

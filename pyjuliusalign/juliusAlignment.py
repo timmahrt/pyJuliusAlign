@@ -10,9 +10,9 @@ from os.path import join
 
 import subprocess
 
-from pyjulius import jProcessingSnippet
-from pyjulius import audioScripts
-from pyjulius import utils
+from pyjuliusalign import jProcessingSnippet
+from pyjuliusalign import audioScripts
+from pyjuliusalign import utils
 
 PHONE = "phones"
 WORD = "words"
@@ -36,16 +36,38 @@ class JuliusAlignmentError(Exception):
         return "Failed to align: "
 
 
+class JuliusScriptExecutionFailed(Exception):
+    
+    def __init__(self, cmdList):
+        super(JuliusScriptExecutionFailed, self).__init__()
+        self.cmdList = cmdList
+    
+    def __str__(self):
+        errorStr = ("\ Execution Failed.  Please check the following:\n"
+                    "- Perl and the julius4.pl script exist in the "
+                    "locations specified\n"
+                    "- you have edited the 'user configuration' part of "
+                    "'segment_julius4.pl'\n"
+                    "- script arguments are correct\n\n"
+                    "If you can't locate the problem, I recommend using "
+                    "absolute paths rather than relative "
+                    "paths and using paths without spaces in any folder "
+                    "or file names\n\n"
+                    "Here is the command that python attempted to run:\n")
+        cmdTxt = " ".join(self.cmdList)
+        return errorStr + cmdTxt
+
+
 def runJuliusAlignment(wavFN, transFN, juliusScriptPath, perlPath):
     
     if not os.path.exists(juliusScriptPath):
         raise JuliusRunError(juliusScriptPath)
     
-    argList = [perlPath, juliusScriptPath, wavFN, transFN]
+    cmdList = [perlPath, juliusScriptPath, wavFN, transFN]
+    myProcess = subprocess.Popen(cmdList)
     
-    nullFD = open(os.devnull, "w")
-    subprocess.call(argList, stdout=nullFD,
-                    stderr=open("julius_error.txt", "w"))
+    if myProcess.wait():
+        raise JuliusScriptExecutionFailed(cmdList)
 
 
 def parseJuliusOutput(juliusOutputFN):
@@ -187,6 +209,7 @@ def juliusAlignCabocha(dataList, wavPath, wavFN, juliusScriptPath, soxPath,
                 phoneStopTime = intervalEnd
             
             # Store the phone here
+            print(float(phoneStartTime), float(phoneStopTime))
             assert(float(phoneStartTime) < float(phoneStopTime))
             entryDict[PHONE].append((phoneStartTime, phoneStopTime, label))
             
@@ -197,7 +220,8 @@ def juliusAlignCabocha(dataList, wavPath, wavFN, juliusScriptPath, soxPath,
             # Next iteration
             streamStart = stop
             i += 1
-    
+        print(wordList)
+        print(wordTimeList)
         # Store the words
         for i in range(len(wordList)):
             assert(len(wordTimeList[i]) != 0)

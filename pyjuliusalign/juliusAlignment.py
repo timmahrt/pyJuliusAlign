@@ -58,12 +58,14 @@ class JuliusScriptExecutionFailed(Exception):
         return errorStr + cmdTxt
 
 
-def runJuliusAlignment(wavFN, transFN, juliusScriptPath, perlPath):
+def runJuliusAlignment(resourcePath, juliusScriptPath, perlPath):
     
     if not os.path.exists(juliusScriptPath):
         raise JuliusRunError(juliusScriptPath)
     
-    cmdList = [perlPath, juliusScriptPath, wavFN, transFN]
+    resourcePath = os.path.abspath(resourcePath)
+
+    cmdList = [perlPath, juliusScriptPath, resourcePath]
     myProcess = subprocess.Popen(cmdList)
     
     if myProcess.wait():
@@ -113,7 +115,7 @@ def juliusAlignCabocha(dataList, wavPath, wavFN, juliusScriptPath, soxPath,
     
     tmpTxtFN = join(tmpOutputPath, "tmp.txt")
     tmpWavFN = join(tmpOutputPath, "tmp.wav")
-    tmpOutputFN = join(tmpOutputPath, "tmp.txt.align")
+    tmpOutputFN = join(tmpOutputPath, "tmp.lab")
     
     entryDict = {}
     for aspect in [UTTERANCE, WORD, PHONE]:
@@ -175,7 +177,7 @@ def juliusAlignCabocha(dataList, wavPath, wavFN, juliusScriptPath, soxPath,
                                    soxPath=soxPath)
         
         # Run forced alignment
-        runJuliusAlignment(tmpWavFN, tmpTxtFN, juliusScriptPath, perlPath)
+        runJuliusAlignment(tmpOutputPath, juliusScriptPath, perlPath)
         
         # Get the output (timestamps for each phone)
         numIntervals += 1

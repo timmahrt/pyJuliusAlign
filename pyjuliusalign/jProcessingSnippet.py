@@ -164,7 +164,21 @@ class CabochaOutputError(Exception):
         return ("Unexpected error in cabocha output "
                 "(possibly a problem with cabocha).  See error:\n%s" %
                 self.outputStr)
-        
+
+
+class TextDecodingError(Exception):
+
+    def __init__(self, encoding):
+        super(TextDecodingError, self).__init__()
+        self.encoding = encoding
+
+    def __str__(self):
+        print(self.encoding)
+        return ("Cabocha tried to decode text with the encoding '%s' but it failed. "
+                "If you specify a different encoding in "
+                "alignFromTextgrid.convertCorpusToKanaAndRomaji() that will probably "
+                "fix the problem." %
+                self.encoding)
 
 def _formdamage(sent):
     rectify = []
@@ -208,8 +222,11 @@ def cabocha(sentence, cabochaEncoding, cabochaPath=None):
     try:
         retStr = unicode(output, cabochaEncoding)
     except NameError:  # unicode() does not exist in python 3
-        retStr = str(output, cabochaEncoding)
-        
+        try:
+            retStr = str(output, cabochaEncoding)
+        except UnicodeDecodeError:
+            raise TextDecodingError(cabochaEncoding)
+
     return retStr
 
 

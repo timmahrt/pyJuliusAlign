@@ -24,7 +24,7 @@ cabochaPath = r"C:\Program Files (x86)\CaboCha\bin\cabocha.exe"
 perlPath = r""
 
 # Mac/Unix executables
-juliusScriptPath = "/Users/tmahrt/Documents/julius4-segmentation-kit-v1.0/segment_julius4.pl"
+juliusScriptPath = "/Users/tmahrt/Downloads/segmentation-kit/segment_julius.pl"
 soxPath = "/opt/local/bin/sox"
 cabochaPath = "/usr/local/bin/cabocha"
 perlPath = "/opt/local/bin/perl"

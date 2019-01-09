@@ -21,7 +21,7 @@ from pyjuliusalign import audioScripts
 from praatio import tgio
 
 
-def textgridToCSV(inputPath, outputPath):
+def textgridToCSV(inputPath, outputPath, ext='.csv'):
     utils.makeDir(outputPath)
     
     existsFNList = utils.findFiles(outputPath, filterExt=".csv")
@@ -36,7 +36,7 @@ def textgridToCSV(inputPath, outputPath):
         
         name = os.path.splitext(fn)[0]
         outputTxt = "\n".join(outputList)
-        outputFN = join(outputPath, "%s.csv" % name)
+        outputFN = join(outputPath, "%s%s" % (name, ext))
         with io.open(outputFN, "w", encoding="utf-8") as fd:
             fd.write(outputTxt)
 

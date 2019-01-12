@@ -23,8 +23,8 @@ Here is a cropped view of the before and after output file in the example files:
 # Table of contents
 1. [Major Revisions](#major-revisions)
 2. [Requirements](#requirements)
-  2a. [Mac-specific Requirements Information](#mac-specific-requirements-information)
-  2b. [Windows-specific Requirements Information](#windows-specific-requirements-information)
+  * [Mac-specific Requirements Information](#mac-specific-requirements-information)
+  * [Windows-specific Requirements Information](#windows-specific-requirements-information)
 4. [Installation](#installation)
 5. [Testing Installation](#testing-installation)
 6. [Example Usage](#example-usage)

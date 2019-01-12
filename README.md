@@ -25,10 +25,10 @@ Here is a cropped view of the before and after output file in the example files:
 2. [Requirements](#requirements)
   * [Mac-specific Requirements Information](#mac-specific-requirements-information)
   * [Windows-specific Requirements Information](#windows-specific-requirements-information)
-4. [Installation](#installation)
-5. [Testing Installation](#testing-installation)
-6. [Example Usage](#example-usage)
-7. [Troubleshooting](#troubleshooting)
+3. [Installation](#installation)
+4. [Testing Installation](#testing-installation)
+5. [Example Usage](#example-usage)
+6. [Troubleshooting](#troubleshooting)
 
 
 ## Major Revisions

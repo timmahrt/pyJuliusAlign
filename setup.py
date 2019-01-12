@@ -8,7 +8,7 @@ Created on Aug 29, 2014
 from setuptools import setup
 import io
 setup(name='pyjuliusalign',
-      version='2.0.0',
+      version='2.0.1',
       author='Tim Mahrt',
       author_email='timmahrt@gmail.com',
       url='https://github.com/timmahrt/pyJuliusAlign',
@@ -18,4 +18,5 @@ setup(name='pyjuliusalign',
       license='LICENSE',
       description='A helper library for doing forced-alignment in Japanese with Julius.',
       long_description=io.open('README.md', 'r', encoding="utf-8").read(),
+      long_description_content_type='text/markdown',
       )

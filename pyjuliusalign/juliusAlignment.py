@@ -121,6 +121,7 @@ def juliusAlignCabocha(dataList, wavPath, wavFN, juliusScriptPath, soxPath,
     numPhonesFailedToAlign = 0
     numIntervals = 0
     numFailedIntervals = 0
+
     # intervalStart, intervalEnd, line, wordList, kanaList, romajiList
     for rowTuple in dataList:
         intervalStart = rowTuple[0]
@@ -142,16 +143,15 @@ def juliusAlignCabocha(dataList, wavPath, wavFN, juliusScriptPath, soxPath,
         # Create romajiTxt (for forced alignment) and
         # phoneList (for the textgrid)
         # Phones broken up by word
-        tmpRomajiList = [row.split(" ") for row in romajiList]
-        numPhones = len(tmpRomajiList)
-        wordTimeList = [[] for i in range(len(wordList))]
+        tmpRomajiList = []
+        tmpFlattenedRomajiList = []
+        for row in romajiList:
+            rowList = row.split(" ")
+            tmpRomajiList.append(rowList)
+            tmpFlattenedRomajiList.extend(rowList)
 
-        phoneToWordIndexList = []
-        phonesSoFar = 0
-        for i in range(numPhones):
-            numPhones = len(tmpRomajiList[i])
-            phoneToWordIndexList.append((phonesSoFar, phonesSoFar + numPhones - 1))
-            phonesSoFar += numPhones
+        numWords = len(wordList)
+        wordTimeList = [[] for i in range(numWords)]
 
         romajiTxt = " ".join(romajiList)
         phoneList = [phone for phone in romajiTxt.split(" ")]
@@ -182,40 +182,41 @@ def juliusAlignCabocha(dataList, wavPath, wavFN, juliusScriptPath, soxPath,
         try:
             matchList = parseJuliusOutput(tmpOutputFN)
         except JuliusAlignmentError:
-            if forceMonophoneAlignFlag is True and numPhones == 1:
+            if forceMonophoneAlignFlag is True and numWords == 1:
                 # One phone occupies the whole interval
                 matchList = [(0.0, (intervalEnd - intervalStart) * 100)]
             else:
-                numPhonesFailedToAlign += numPhones
+                numPhonesFailedToAlign += numWords
                 numFailedIntervals += 1
                 print("Failed to align: %s - %f - %f" %
                       ("".join(romajiList), intervalStart, intervalEnd))
                 continue
 
-        # Store the phones
-        streamStart = matchList[0][0]
-        i = 0
-        adjustedPhonList = []
-        for start, stop, label in matchList:
-            assert(float(start) < float(stop))
-            
-            phoneStartTime = intervalStart + start
-            phoneStopTime = intervalStart + stop
-            
-            # Julius is conservative in estimating the final vowel.  Stretch it
-            # to be the length of the utterance
-            if forceEndTimeFlag is True and i + 1 == len(matchList):
-                phoneStopTime = intervalEnd
-            
-            # Store the phone here
-            assert(float(start) < float(stop))
-            adjustedPhonList.append((phoneStartTime, phoneStopTime, label))
-            
-            # Next iteration
-            streamStart = stop
-            i += 1
+        adjustedPhonList = [[intervalStart + start, intervalStart + stop, label]
+                            for start, stop, label in matchList]
+
+        # Julius is conservative in estimating the final vowel.  Stretch it
+        # to be the length of the utterance
+        if forceEndTimeFlag:
+            adjustedPhonList[-1][1] = intervalEnd
 
         entryDict[PHONE].extend(adjustedPhonList)
+
+        # Get the bounding indicies for the phones in each word
+        phoneToWordIndexList = []
+        phonesSoFar = 0
+        for i in range(len(wordList)):
+            numPhones = len(tmpRomajiList[i])
+            phoneToWordIndexList.append((phonesSoFar, phonesSoFar + numPhones - 1))
+            phonesSoFar += numPhones
+
+        # If julius uses a silence model and we don't, then adjust our timings
+        phoneListFromJulius = [label for _, _, label in adjustedPhonList]
+        if  "silB" in phoneListFromJulius and "silB" not in tmpFlattenedRomajiList:
+            phoneToWordIndexList = [(startI + 1, endI + 1) for startI, endI in phoneToWordIndexList]
+            lastI = phoneToWordIndexList[-1][1]
+            phoneToWordIndexList = [(0, 0)] + phoneToWordIndexList + [(lastI + 1, lastI + 1)]
+            wordList = [""] + wordList + [""]
 
         # Store the words
         for i in range(len(wordList)):
@@ -225,7 +226,7 @@ def juliusAlignCabocha(dataList, wavPath, wavFN, juliusScriptPath, soxPath,
                                     adjustedPhonList[stopI][1],
                                     wordList[i]))
 
-        numTotalPhones += numPhones
+        numTotalPhones += numWords
 
     statList = [numPhonesFailedToAlign, numTotalPhones,
                 numFailedIntervals, numIntervals]

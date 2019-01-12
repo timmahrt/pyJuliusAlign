@@ -18,8 +18,7 @@ A python interface to Julius, the speech recognition system.
 
 Here is a cropped view of the before and after output file in the example files:
 
-.. image:: examples/files/pyjulius_example.png
-   :width: 500px
+![](examples/files/pyjulius_example.png =500x)
 
 # Table of contents
 1. [Major Revisions](#major-revisions)

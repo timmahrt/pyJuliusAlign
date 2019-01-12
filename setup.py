@@ -17,5 +17,5 @@ setup(name='pyjuliusalign',
       package_data={'pyjuliusalign': ["hiraganaChart.txt", "katakanaChart.txt"]},
       license='LICENSE',
       description='A helper library for doing forced-alignment in Japanese with Julius.',
-      long_description=io.open('README.rst', 'r', encoding="utf-8").read(),
+      long_description=io.open('README.md', 'r', encoding="utf-8").read(),
       )

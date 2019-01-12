@@ -33,16 +33,25 @@ perlPath = "/opt/local/bin/perl"
 # Whichever cabocha was installed with
 cabochaEncoding = "euc-jp"
 
+# Use this to convert your textgrids to .txt files which are used by julius
+# If you do not have textgrids or you already have text transcripts, skip this step
+print("\nSTEP 1: Generating transcripts")
 alignFromTextgrid.textgridToCSV(inputPath=path,
-                                outputPath=path)
+                                outputPath=path,
+                                outputExt=".txt")
 
+# Julius expects kana, so we must first convert kanji to kana
+# If your transcripts are all in kana, skip this step
+print("\nSTEP 2: Converting all text to kana")
 alignFromTextgrid.convertCorpusToKanaAndRomaji(inputPath=path,
                                                outputPath=cabochaOutput,
                                                cabochaEncoding=cabochaEncoding,
                                                cabochaPath=cabochaPath,
                                                encoding="utf-8")
 
-alignFromTextgrid.forceAlignCorpus(wavPath=path, txtPath=cabochaOutput,
+print("\nSTEP 3: Run the force aligner")
+alignFromTextgrid.forceAlignCorpus(wavPath=path,
+                                   txtPath=cabochaOutput,
                                    outputPath=alignedOutput,
                                    juliusScriptPath=juliusScriptPath,
                                    soxPath=soxPath,

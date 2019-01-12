@@ -21,13 +21,10 @@ from pyjuliusalign import audioScripts
 from praatio import tgio
 
 
-def textgridToCSV(inputPath, outputPath, ext='.csv'):
+def textgridToCSV(inputPath, outputPath, outputExt='.csv'):
     utils.makeDir(outputPath)
-    
-    existsFNList = utils.findFiles(outputPath, filterExt=".csv")
-    
-    for fn in utils.findFiles(inputPath, filterExt=".TextGrid",
-                              skipIfNameInList=existsFNList):
+
+    for fn in utils.findFiles(inputPath, filterExt=".TextGrid"):
         tg = tgio.openTextgrid(join(inputPath, fn))
         tier = tg.tierDict["utterances"]
         outputList = []
@@ -36,7 +33,7 @@ def textgridToCSV(inputPath, outputPath, ext='.csv'):
         
         name = os.path.splitext(fn)[0]
         outputTxt = "\n".join(outputList)
-        outputFN = join(outputPath, "%s%s" % (name, ext))
+        outputFN = join(outputPath, "%s%s" % (name, outputExt))
         with io.open(outputFN, "w", encoding="utf-8") as fd:
             fd.write(outputTxt)
 
@@ -53,10 +50,10 @@ def convertCorpusToKanaAndRomaji(inputPath, outputPath, cabochaEncoding,
     
     numUnnamedEntities = 0
     numUnidentifiedUtterances = 0
-    finishedList = utils.findFiles(outputPath, filterExt=".csv")
-    for fn in utils.findFiles(inputPath, filterExt=".csv",
-                              skipIfNameInList=finishedList):
-        print(fn)
+    numWordsProcessedWithNoError = 0
+
+    fnList = utils.findFiles(inputPath, filterExt=".txt")
+    for fn in fnList:
         with io.open(join(inputPath, fn), "rU", encoding=encoding) as fd:
             text = fd.read()
         textList = text.split("\n")
@@ -73,14 +70,15 @@ def convertCorpusToKanaAndRomaji(inputPath, outputPath, cabochaEncoding,
                 continue
             origLine = line
             
-            dataPrepTuple = juliusAlignment.prepData(line, cabochaEncoding,
-                                                     cabochaPath)
+            dataPrepTuple = juliusAlignment.formatTextForJulius(line, cabochaEncoding,
+                                                                cabochaPath)
             
             (line, tmpWordList, tmpKanaList, tmpRomajiList,
-             unidentifiedUtterance, unnamedEntity) = dataPrepTuple
+             unidentifiedUtterance, unnamedEntity, tmpWordCount) = dataPrepTuple
              
             numUnnamedEntities += unnamedEntity
             numUnidentifiedUtterances += unidentifiedUtterance
+            numWordsProcessedWithNoError += tmpWordCount
             
             name = os.path.splitext(fn)[0]
             outputList = [u"%s,%s,%s" % (name, startTime, stopTime), origLine,
@@ -89,11 +87,12 @@ def convertCorpusToKanaAndRomaji(inputPath, outputPath, cabochaEncoding,
             
             speakerInfoList.append(outputStr)
         
-        print(fn)
-        print("Number of unnamed entities for fn: %d" %
-              numUnnamedEntitiesForFN)
-        print("Number of unidentified utterances for fn: %d" %
-              numUnidentifiedUtterancesForFN)
+        if(numUnnamedEntities > 0 or numUnidentifiedUtterances > 0):
+            print(fn)
+            print("Number of unnamed entities for fn: %d" %
+                  numUnnamedEntitiesForFN)
+            print("Number of unidentified utterances for fn: %d" %
+                  numUnidentifiedUtterancesForFN)
         
         numUnnamedEntities += numUnnamedEntitiesForFN
         numUnidentifiedUtterances += numUnidentifiedUtterancesForFN
@@ -102,9 +101,10 @@ def convertCorpusToKanaAndRomaji(inputPath, outputPath, cabochaEncoding,
             fd.write("\n".join(speakerInfoList))
      
     print("\n")
+    print("Number of transcripts converted: %d" % len(fnList))
     print("Number of unnamed entities: %d" % numUnnamedEntities)
     print("Number of unidentified utterances: %d" % numUnidentifiedUtterances)
-
+    print("Number of words processed without error: %d" % numWordsProcessedWithNoError)
 
 def forceAlignFile(speakerList, wavPath, wavNameDict, txtPath, txtFN,
                    outputPath, outputWavName, juliusScriptPath, soxPath,
@@ -156,7 +156,6 @@ def forceAlignFile(speakerList, wavPath, wavNameDict, txtPath, txtFN,
                                                     wavNameDict[speaker],
                                                     juliusScriptPath, soxPath,
                                                     perlPath, False, True, True)
-        
         speakerEntryDict[speaker], statList = output
         
         numPhonesFailedAlignment += statList[0]
@@ -175,7 +174,6 @@ def forceAlignFile(speakerList, wavPath, wavNameDict, txtPath, txtFN,
                        juliusAlignment.PHONE]:
             
             tierName = "%s_%s" % (aspect, speaker)
-
             tier = tgio.IntervalTier(tierName,
                                      speakerEntryDict[speaker][aspect],
                                      minT=0, maxT=maxDuration)
@@ -198,13 +196,10 @@ def forceAlignCorpus(wavPath, txtPath, outputPath, juliusScriptPath=None,
     
     utils.makeDir(outputPath)
     
-    finishedList = utils.findFiles(outputPath, filterExt=".TextGrid",
-                                   stripExt=True)
-    for name in utils.findFiles(txtPath, filterExt=".csv",
-                                skipIfNameInList=finishedList, stripExt=True):
+    for name in utils.findFiles(txtPath, filterExt=".txt", stripExt=True):
         wavNameDict = {name: "%s.wav" % name}
         output = forceAlignFile([name, ], wavPath, wavNameDict, txtPath,
-                                name + ".csv", outputPath, name,
+                                name + ".txt", outputPath, name,
                                 juliusScriptPath, soxPath, perlPath)
 
         (numPhonesFailedAlignment, numPhones,
@@ -215,9 +210,9 @@ def forceAlignCorpus(wavPath, txtPath, outputPath, juliusScriptPath=None,
         percentFailedIntervals = utils.divide(numFailedIntervals,
                                               numIntervals, 0) * 100
         print("%d intervals of %d total intervals (%0.2f%%) and %d phones "
-              "of %d total phones (%0.2f%%) failed to align for %s" %
-              (numFailedIntervals, numIntervals, percentFailedIntervals,
-               numPhonesFailedAlignment, numPhones, percentFailed, name))
+              "of %d total phones (%0.2f%%) successfully aligned for %s" %
+              (numIntervals - numFailedIntervals, numIntervals, 100 * (1 - percentFailedIntervals),
+               numPhones - numPhonesFailedAlignment, numPhones, 100 * (1 - percentFailed), name))
         
         totalNumPhonesFailed += numPhonesFailedAlignment
         totalNumPhones += numPhones
@@ -231,7 +226,6 @@ def forceAlignCorpus(wavPath, txtPath, outputPath, juliusScriptPath=None,
                                                totalNumIntervals, 0) * 100
     print("====Summary====")
     print("%d intervals of %d total intervals (%0.2f%%) and %d phones of "
-          "%d total phones (%0.2f%%) failed to align" %
-          (totalNumIntervalsFailed, totalNumIntervals,
-           totalPercentFailedIntervals, totalNumPhonesFailed,
-           totalNumPhones, totalPercentFailed))
+          "%d total phones (%0.2f%%) successfully aligned" %
+          (totalNumIntervals - totalNumIntervalsFailed, totalNumIntervals, 100 * (1 - totalPercentFailedIntervals),
+           totalNumPhones - totalNumPhonesFailed, totalNumPhones, 100 * (1 - totalPercentFailed)))

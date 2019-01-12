@@ -7,6 +7,7 @@ Created on Aug 20, 2014
 
 import os
 from os.path import join
+import datetime
 
 import subprocess
 
@@ -58,7 +59,7 @@ class JuliusScriptExecutionFailed(Exception):
         return errorStr + cmdTxt
 
 
-def runJuliusAlignment(resourcePath, juliusScriptPath, perlPath):
+def runJuliusAlignment(resourcePath, juliusScriptPath, perlPath, loggerFd):
     
     if not os.path.exists(juliusScriptPath):
         raise JuliusRunError(juliusScriptPath)
@@ -66,39 +67,29 @@ def runJuliusAlignment(resourcePath, juliusScriptPath, perlPath):
     resourcePath = os.path.abspath(resourcePath)
 
     cmdList = [perlPath, juliusScriptPath, resourcePath]
-    myProcess = subprocess.Popen(cmdList)
+    print(cmdList)
+    myProcess = subprocess.Popen(cmdList, stdout=loggerFd)
     
     if myProcess.wait():
         raise JuliusScriptExecutionFailed(cmdList)
 
 
-def parseJuliusOutput(juliusOutputFN):
-    '''Parse the output of julius'''
-    with open(juliusOutputFN, "r") as fd:
-        output = fd.read()
-    try:
-        output = output.split("----------------------------------------")[1]
-    except IndexError:
-        raise JuliusAlignmentError()
-    output = output.split("re-computed")[0]
-    
-    # Extract the individual phones, along with their timing information
-    start = 0
-    matchList = []
-    while True:
-        try:
-            start = output.index('[', start)
-            end = output.index(']', start)
-        except ValueError:
-            break
-        
-        matchList.append(output[start + 1:end])
-        start = end
-        
-    matchList = [[float(value.strip()) for value in row.split()]
-                 for row in matchList]
+def parseJuliusOutput(juliusOutputFn):
+    with open(juliusOutputFn, "r") as fd:
+        juliusOutput = fd.read()
 
-    return matchList
+    returnList = []
+    for row in juliusOutput.split("\n"):
+        row = row.strip()
+        if row == "":
+            continue
+        row = row.split(" ")
+        start = float(row[0])
+        stop = float(row[1])
+        label = row[2]
+        returnList.append((start, stop, label))
+
+    return returnList
 
 
 def juliusAlignCabocha(dataList, wavPath, wavFN, juliusScriptPath, soxPath,
@@ -111,6 +102,10 @@ def juliusAlignCabocha(dataList, wavPath, wavFN, juliusScriptPath, soxPath,
     [startTime, endTime, wordList, kanaList, romajiList]
     '''
     tmpOutputPath = join(wavPath, "align_tmp")
+    
+    logFn = join(tmpOutputPath, 'align_log_' + str(datetime.datetime.now()) + '.txt')
+    loggerFd = open(logFn, "w")
+
     utils.makeDir(tmpOutputPath)
     
     tmpTxtFN = join(tmpOutputPath, "tmp.txt")
@@ -150,11 +145,14 @@ def juliusAlignCabocha(dataList, wavPath, wavFN, juliusScriptPath, soxPath,
         tmpRomajiList = [row.split(" ") for row in romajiList]
         numPhones = len(tmpRomajiList)
         wordTimeList = [[] for i in range(len(wordList))]
+
         phoneToWordIndexList = []
+        phonesSoFar = 0
         for i in range(numPhones):
-            for j in range(len(tmpRomajiList[i])):
-                phoneToWordIndexList.append(i)
-        
+            numPhones = len(tmpRomajiList[i])
+            phoneToWordIndexList.append((phonesSoFar, phonesSoFar + numPhones - 1))
+            phonesSoFar += numPhones
+
         romajiTxt = " ".join(romajiList)
         phoneList = [phone for phone in romajiTxt.split(" ")]
         
@@ -177,7 +175,7 @@ def juliusAlignCabocha(dataList, wavPath, wavFN, juliusScriptPath, soxPath,
                                    soxPath=soxPath)
         
         # Run forced alignment
-        runJuliusAlignment(tmpOutputPath, juliusScriptPath, perlPath)
+        runJuliusAlignment(tmpOutputPath, juliusScriptPath, perlPath, loggerFd)
         
         # Get the output (timestamps for each phone)
         numIntervals += 1
@@ -193,17 +191,16 @@ def juliusAlignCabocha(dataList, wavPath, wavFN, juliusScriptPath, soxPath,
                 print("Failed to align: %s - %f - %f" %
                       ("".join(romajiList), intervalStart, intervalEnd))
                 continue
-        
+
         # Store the phones
         streamStart = matchList[0][0]
         i = 0
-        for timeList, label in zip(*[matchList, phoneList]):
-            
-            start, stop = timeList
+        adjustedPhonList = []
+        for start, stop, label in matchList:
             assert(float(start) < float(stop))
             
-            phoneStartTime = intervalStart + streamStart * 0.01
-            phoneStopTime = intervalStart + stop * 0.01
+            phoneStartTime = intervalStart + start
+            phoneStopTime = intervalStart + stop
             
             # Julius is conservative in estimating the final vowel.  Stretch it
             # to be the length of the utterance
@@ -211,35 +208,32 @@ def juliusAlignCabocha(dataList, wavPath, wavFN, juliusScriptPath, soxPath,
                 phoneStopTime = intervalEnd
             
             # Store the phone here
-            print(float(phoneStartTime), float(phoneStopTime))
-            assert(float(phoneStartTime) < float(phoneStopTime))
-            entryDict[PHONE].append((phoneStartTime, phoneStopTime, label))
-            
-            # Use those same phone times in determining the word time later
-            j = phoneToWordIndexList[i]
-            wordTimeList[j].extend([phoneStartTime, phoneStopTime])
+            assert(float(start) < float(stop))
+            adjustedPhonList.append((phoneStartTime, phoneStopTime, label))
             
             # Next iteration
             streamStart = stop
             i += 1
-        print(wordList)
-        print(wordTimeList)
+
+        entryDict[PHONE].extend(adjustedPhonList)
+
         # Store the words
         for i in range(len(wordList)):
-            assert(len(wordTimeList[i]) != 0)
+            startI, stopI = phoneToWordIndexList[i]
             
-            entryDict[WORD].append((min(wordTimeList[i]), max(wordTimeList[i]),
+            entryDict[WORD].append((adjustedPhonList[startI][0],
+                                    adjustedPhonList[stopI][1],
                                     wordList[i]))
 
         numTotalPhones += numPhones
-    
+
     statList = [numPhonesFailedToAlign, numTotalPhones,
                 numFailedIntervals, numIntervals]
     return entryDict, statList
 
 
-def prepData(line, cabochaEncoding, cabochaPath):
-    '''Prepares a line, processed by cabocha, for use in julius'''
+def formatTextForJulius(line, cabochaEncoding, cabochaPath):
+    '''Prepares a single line of text, processed by cabocha, for use in julius'''
     unidentifiedUtterance = 0
     unnamedEntity = 0
         
@@ -265,9 +259,6 @@ def prepData(line, cabochaEncoding, cabochaPath):
     except (jProcessingSnippet.ChunkingError,
             jProcessingSnippet.NonKatakanaError) as e:
         print(u"%s, %s" % (str(e), origLine))
-        tmpWordList = [""]
-        tmpKanaList = [""]
-        tmpRomajiList = [""]
         unidentifiedUtterance = 1
     except jProcessingSnippet.UnidentifiedJapaneseText as e:
         # Maybe specific to my corpus?
@@ -276,17 +267,13 @@ def prepData(line, cabochaEncoding, cabochaPath):
         else:
             print(u"%s" % str(e))
             unidentifiedUtterance = 1
-        tmpWordList = [""]
-        tmpKanaList = [""]
-        tmpRomajiList = [""]
     except jProcessingSnippet.EmptyStrError as e:
-        tmpWordList = [""]
-        tmpKanaList = [""]
-        tmpRomajiList = [""]
+        pass
     except Exception:
         print(line)
         raise
     line = line.replace(u",", u"")
-    
+
     return (line, ",".join(tmpWordList), ",".join(tmpKanaList),
-            ",".join(tmpRomajiList), unidentifiedUtterance, unnamedEntity)
+            ",".join(tmpRomajiList), unidentifiedUtterance, unnamedEntity,
+            len(tmpWordList))

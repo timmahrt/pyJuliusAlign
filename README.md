@@ -7,9 +7,22 @@
 
 -----
 
-A python interface to Julius, the speech recognition system.
+録音音声とトランスクリプトはあるけど、どこにその単語またはその子音、母音があるのか正確に分からない時、それらを探すために「forced alignment」という機能を使います。「Julius」という音声認識システムは日本語で「forced alignment」を行うことができますが、音声内に発音を入れる必要があります。がしかし、基本的にはトランスクリプトは文字だけです。「cabocha」というソフトウェアは文章を元にそれぞれの単語からその発音まで変換することができます。「pyJuliusAlign」というライブラリは日本語を「forced alignment」する為に「Julius」と「cabocha」を一緒に使います。TextGridされた音声録音には、単語とその子音、母音を直接挿入することができます。
 
-**The primary function right now is the Japanese forced aligner.**  Given the transcript for an audio file in Japanese, this series of scripts will estimate where those phones were produced in the audio.
+When we have a speech recording and a text transcript but we don't know where the words, vowels, and consonants are, we can use a tool called "forced alignment" to find them. There is a speech recognition system called "Julius" that can do forced alignment in Japanese. However, it requires the pronunciation used in the recording. Usually, in the text transcript, there is only words. The "Cabocha" software can convert sentences to individual words and their pronunciations. The software library "pyJuliusAlign" uses "Julius" and "cabocha" together. In textgrid speech transcripts, words, vowels, and consonants can be directly inserted.
+
+----
+
+英語やフランス語やスペイン語など「forced alignment」をしたいなら「SPPAS」と言うソフトウェアをお勧めします。
+
+If you want to do forced alignment in English, French, or Spanish, I recommend SPPAS.
+
+[http://www.sppas.org](http://www.sppas.org/)
+
+
+----
+
+To get started:
 
 */examples/align_example.py* should be sufficient for a large number of cases.
 

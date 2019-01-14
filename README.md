@@ -71,7 +71,6 @@ Julius - https://github.com/julius-speech/julius
 
 Julius Segmentation Kit - https://github.com/julius-speech/segmentation-kit
  - it's not a file you "install" but something you'll want to put in a stable folder where you can access it when needed
-
  - Change line 33 to:
   ```perl
   ## data directory
@@ -80,8 +79,8 @@ Julius Segmentation Kit - https://github.com/julius-speech/segmentation-kit
     $datadir = $ARGV[0];
   }
   ```
-
   - Also in the configuration section, I recommend setting `$hmmdefs` to an absolute path e.g. `$hmmdefs="/Users/tmahrt/segmentation-kit/models/hmmdefs_monof_mix16_gid.binhmm"; # monophone model`
+  - Make sure to set silence appropriately.  If you have clearly marked the edges of speech, you'll want to turn off silence marking.  If you have not done so (for example, your recording only includes a single utterance) then you'll want to have the segmentation kit expect silence at the start and end of your recording.
 
 Sox - http://sox.sourceforge.net/
  - Converts the sampling frequency of the audio if needed.

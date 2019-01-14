@@ -72,16 +72,16 @@ Julius - https://github.com/julius-speech/julius
 Julius Segmentation Kit - https://github.com/julius-speech/segmentation-kit
  - it's not a file you "install" but something you'll want to put in a stable folder where you can access it when needed
 
-Change line 33 to:
-```perl
-## data directory
-$datadir = "./wav";
-if (defined $ARGV[0]) {
-  $datadir = $ARGV[0];
-}
-```
+ - Change line 33 to:
+  ```perl
+  ## data directory
+  $datadir = "./wav";
+  if (defined $ARGV[0]) {
+    $datadir = $ARGV[0];
+  }
+  ```
 
-Also in the configuration section, I recommend setting `$hmmdefs` to an absolute path e.g. `$hmmdefs="/Users/tmahrt/segmentation-kit/models/hmmdefs_monof_mix16_gid.binhmm"; # monophone model`
+  - Also in the configuration section, I recommend setting `$hmmdefs` to an absolute path e.g. `$hmmdefs="/Users/tmahrt/segmentation-kit/models/hmmdefs_monof_mix16_gid.binhmm"; # monophone model`
 
 Sox - http://sox.sourceforge.net/
  - Converts the sampling frequency of the audio if needed.

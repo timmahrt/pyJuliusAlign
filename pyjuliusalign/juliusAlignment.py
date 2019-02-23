@@ -102,6 +102,7 @@ def juliusAlignCabocha(dataList, wavPath, wavFN, juliusScriptPath, soxPath,
     [startTime, endTime, wordList, kanaList, romajiList]
     '''
     tmpOutputPath = join(wavPath, "align_tmp")
+    utils.makeDir(tmpOutputPath)
     
     logFn = join(tmpOutputPath, 'align_log_' + str(datetime.datetime.now()) + '.txt')
     loggerFd = open(logFn, "w")

@@ -21,12 +21,12 @@ from pyjuliusalign import audioScripts
 from praatio import tgio
 
 
-def textgridToCSV(inputPath, outputPath, outputExt='.csv'):
+def textgridToCSV(inputPath, outputPath, outputExt='.csv', tierName="utterances"):
     utils.makeDir(outputPath)
 
     for fn in utils.findFiles(inputPath, filterExt=".TextGrid"):
         tg = tgio.openTextgrid(join(inputPath, fn))
-        tier = tg.tierDict["utterances"]
+        tier = tg.tierDict[tierName]
         outputList = []
         for start, stop, label in tier.entryList:
             outputList.append("%s,%s,%s" % (start, stop, label))

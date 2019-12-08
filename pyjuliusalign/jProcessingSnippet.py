@@ -112,7 +112,7 @@ class UnidentifiedJapaneseText(Exception):
         
     def __str__(self):
         return (u"No match in dictionary for word '%s' in sentence: \n'%s'" %
-                (unicode(self.word), unicode(self.sentence)))
+                (self.word, self.sentence))
 
 
 class ChunkingError(Exception):

@@ -18,89 +18,12 @@ All other code is from me
 
 import os
 from os.path import join
-import io
 import subprocess
 import tempfile
 
 import xml.etree.cElementTree as etree
 
-jNlp_KATAKANA_CHART_PATH = join(os.path.dirname(__file__), "katakanaChart.txt")
-jNlp_HIRAGANA_CHART_PATH = join(os.path.dirname(__file__), "hiraganaChart.txt")
-
-
-def parseChart(chartFN):
-    """
-    @return chartDict
-    ��� ==> g,a
-    ��� ==> k,i
-    ������ ==> k,ya
-    Similarily for Hiragana
-    @setrofim : http://www.python-forum.
-     org/pythonforum/viewtopic.php?f=3&t=31935
-    """
-    with io.open(chartFN, "r", encoding="utf-8") as fd:
-        chart = fd.read()
-    
-    lines = chart.split('\n')
-    chartDict = {}
-    output = {}
-    col_headings = lines.pop(0).split()
-    for line in lines:
-        cells = line.split()
-        for i, c in enumerate(cells[1:]):
-            output[c] = cells[0], col_headings[i]
-    
-    for k in sorted(output.keys()):
-        # @k = katakana
-        # @r = first romaji in row
-        # @c = concatinating romaji in column
-        r, c = output[k]
-        if k == 'X':
-            continue
-        romaji = ''.join([item.replace('X', '') for item in [r, c]])
-        chartDict[k] = romaji
-    
-    return chartDict
-
-
-def _invertDict(tmpDict):
-    '''Flips key-value relationship in a dictionary'''
-    retDict = {}
-    for key, value in tmpDict.items():
-        retDict[value] = key
-    
-    return retDict
-
-
-def _getKataToKanaDict():
-    retDict = {u"ャ": u"ゃ", u"ュ": u"ゅ", u"ョ": u"ょ", u"ッ": u"っ",
-               # u"ァ", u"ィ", u"ゥ", u"ェ", u"ォ",
-               }
-
-    for kata in kataToRomajiDict.keys():
-        kana = romajiToKanaDict[kataToRomajiDict[kata]]
-        retDict[kata] = kana
-
-    return retDict
-
-
-kataToRomajiDict = parseChart(jNlp_KATAKANA_CHART_PATH)
-kanaToRomajiDict = parseChart(jNlp_HIRAGANA_CHART_PATH)
-romajiToKataDict = _invertDict(kataToRomajiDict)
-romajiToKanaDict = _invertDict(kanaToRomajiDict)
-kataToKanaDict = _getKataToKanaDict()
-kanaToKataDict = _invertDict(kataToKanaDict)
-
-
-def convertKanaToKata(inputStr):
-    '''Input hiragana and return the corresponding string in katakana'''
-    retStr = u""
-    for char in inputStr:
-        if char in kanaToKataDict.keys():
-            char = kanaToKataDict[char]
-        retStr += char
-
-    return retStr
+from pyjuliusalign import convertKana
 
 
 class UnidentifiedJapaneseText(Exception):
@@ -243,10 +166,10 @@ def jReads(target_sent, cabochaEncoding, cabochaPath):
     retJReadsToks = []
     retWordList = []
     
-    keyList = list(kataToRomajiDict.keys())
+    keyList = list(convertKana.kataToRomajiDict.keys())
     validKatakanaList = [u"ャ", u"ュ", u"ョ", u"ッ", u"ァ", u"ィ",
                          u"ゥ", u"ェ", u"ォ", u"ー", ] + keyList
-#     validHiraganaList = [u"ゃ", u"ゅ", u"ょ", u"っ"] + kanaToRomajiDict.keys()
+#     validHiraganaList = [u"ゃ", u"ゅ", u"ょ", u"っ"] + convertKana.kanaToRomajiDict.keys()
     for chunk in sentence:
         jReadsToks = []
         wordList = []
@@ -272,7 +195,7 @@ def jReads(target_sent, cabochaEncoding, cabochaPath):
             else:
                 # Map all hiragana to katakana (in what situations would a
                 # hiragana word not appear in our dictionary?
-                word = convertKanaToKata(word)
+                word = convertKana.convertKanaToKata(word)
 
                 # If the text is all katakana, keep it,
                 # otherwise, assume an error
@@ -349,7 +272,7 @@ def getChunkedKana(string, cabochaEncoding, cabochaPath):
             else:
                 # Single-phone characters
                 if kana == u"ン" or kana in vowelList:
-                    romanjiList.append(kataToRomajiDict[kana])
+                    romanjiList.append(convertKana.kataToRomajiDict[kana])
                 else:
                     if kana in yModifierDict.keys():  # e.g. 'ィ' in 'ティム'
                         romanjiList.pop(-1)
@@ -357,7 +280,7 @@ def getChunkedKana(string, cabochaEncoding, cabochaPath):
                     else:
                         try:
                             # Normal case for two-phone characters
-                            syllable = kataToRomajiDict[kana]
+                            syllable = convertKana.kataToRomajiDict[kana]
                         except KeyError:
                             raise NonKatakanaError(kana, string)
                     
@@ -384,7 +307,7 @@ def chunkKatakana(kanaStr):
         # Some palatalized consonants are in our chart
         # (notably 'jy' and 'shy' are missing)
         kanaFlag = kana in [u"ャ", u"ュ", u"ョ"]
-        if kanaFlag and returnList[-1] + kana in kataToRomajiDict.keys():
+        if kanaFlag and returnList[-1] + kana in convertKana.kataToRomajiDict.keys():
             returnList[-1] += kana
         elif kana == u'ッ':  # Geminate consonant
             pass

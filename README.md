@@ -46,6 +46,9 @@ To get started:
 
 ## Major Revisions
 
+Ver 2.0.5 (October 11, 2020)
+- Fixed a bug preventing the use of triphone models
+
 Ver 2.0 (January 12, 2019)
 - pyJuliusAlign now works with the latest version of Julius and the Julius Segmentation Kit.
   - If you need to use the old segmentation kit (segment_julius4.pl), please use pyJuliusAlign ver 1.1 

@@ -8,12 +8,15 @@ Created on Aug 20, 2014
 import os
 from os.path import join
 import datetime
-
 import subprocess
+
+import Levenshtein
 
 from pyjuliusalign import jProcessingSnippet
 from pyjuliusalign import audioScripts
 from pyjuliusalign import utils
+from pyjuliusalign import convertKana
+from pyjuliusalign import yomi2voca
 
 PHONE = "phones"
 WORD = "words"
@@ -92,6 +95,66 @@ def parseJuliusOutput(juliusOutputFn):
     return returnList
 
 
+def mapJuliusPronunciationToCabocha(juliusPhonesTxt, cabochaPhonesByWord):
+    '''
+    Aligns the phones in a julius pronunciation list into phones chunked into words by cabocha
+
+    The phonetisation is a little different, so the mapping tries to do so gracefully.
+
+    Basically, modify cabochaPhonesByWord to have the same number of phones as juliusPhonesTxt.
+    This is done by finding the edits necessary to make the two strings the same and then applying
+    those edits.
+    Once the two strings contain the same number of phones, dump the phones from julius into the slots for
+    the phones inside of the modified cabocha words.
+    '''
+
+    def _buildWordIndicies(cabochaPhonesByWord):
+        startI = 0
+        wordIndicies = []
+        for word in cabochaPhonesByWord:
+            wordIndicies.append([startI, startI + len(word)])
+            startI += len(word)
+
+        return wordIndicies
+
+    def _getWordForCharIndex(indiciesForWords, targetI):
+        returnI = None
+        for i, indicies in enumerate(indiciesForWords):
+            start, stop = indicies
+            if targetI >= start and targetI < stop:
+                returnI = i
+                break
+        return returnI
+
+
+    cabochaPhonesByWord = [phones.replace(":", "") for phones in cabochaPhonesByWord]
+    cabochaPhonesTxt = " ".join(cabochaPhonesByWord)
+
+    # Mutate cabochaPhonesByWord to contain the same number
+    # of phones as juliusPhonesTxt
+    edits = Levenshtein.editops(cabochaPhonesTxt, juliusPhonesTxt)
+    wordIndicies = _buildWordIndicies(cabochaPhonesByWord)
+    for operation, startIndex, _ in edits:
+        wordI = _getWordForCharIndex(wordIndicies, startIndex)
+        if operation == 'delete':
+            cabochaPhonesByWord[wordI] = cabochaPhonesByWord[wordI][:-1]
+        elif operation == 'insert':
+            cabochaPhonesByWord[wordI] += '-'
+
+    # Chunk juliusPhonesByWord according to the number
+    # of phones in the now aligned cabochaPhonesByWord
+    juliusPhonesByWord = []
+    startI = 0
+    for wordNum, phones in enumerate(cabochaPhonesByWord):
+        endI = startI + len(phones)
+        juliusWordPhones = juliusPhonesTxt[startI: endI]
+
+        juliusPhonesByWord.append(juliusWordPhones)
+        startI = endI + 1 # Add 1 space for the space between words
+
+    return juliusPhonesByWord
+
+
 def juliusAlignCabocha(dataList, wavPath, wavFN, juliusScriptPath, soxPath,
                        perlPath, silenceFlag, forceEndTimeFlag,
                        forceMonophoneAlignFlag):
@@ -129,8 +192,9 @@ def juliusAlignCabocha(dataList, wavPath, wavFN, juliusScriptPath, soxPath,
         intervalEnd = rowTuple[1]
         line = rowTuple[2]
         wordList = rowTuple[3]
-        romajiList = rowTuple[5]
-        
+        kanaList = convertKana.convertKataToKana([char for row in rowTuple[4] for char in row])
+        cabochaPhonesByWord = rowTuple[5]
+
         if line.strip() != "":
             entryDict[UTTERANCE].append((str(intervalStart),
                                          str(intervalEnd),
@@ -140,13 +204,15 @@ def juliusAlignCabocha(dataList, wavPath, wavFN, juliusScriptPath, soxPath,
             continue
         
         assert(intervalStart < intervalEnd)
-        
+
         # Create romajiTxt (for forced alignment) and
         # phoneList (for the textgrid)
         # Phones broken up by word
         tmpRomajiList = []
         tmpFlattenedRomajiList = []
-        for row in romajiList:
+        juliusPhones = yomi2voca.convert(kanaList)
+        juilusPronunciationByWord = mapJuliusPronunciationToCabocha(juliusPhones, cabochaPhonesByWord)
+        for row in juilusPronunciationByWord:
             rowList = row.split(" ")
             tmpRomajiList.append(rowList)
             tmpFlattenedRomajiList.extend(rowList)
@@ -154,10 +220,8 @@ def juliusAlignCabocha(dataList, wavPath, wavFN, juliusScriptPath, soxPath,
         numWords = len(wordList)
         wordTimeList = [[] for i in range(numWords)]
 
-        romajiTxt = " ".join(romajiList)
-        phoneList = [phone for phone in romajiTxt.split(" ")]
-        
         # No forced-alignment if there is no romaji
+        romajiTxt = "".join(kanaList)
         if romajiTxt.strip() == "":
             continue
         
@@ -222,7 +286,6 @@ def juliusAlignCabocha(dataList, wavPath, wavFN, juliusScriptPath, soxPath,
         # Store the words
         for i in range(len(wordList)):
             startI, stopI = phoneToWordIndexList[i]
-            
             entryDict[WORD].append((adjustedPhonList[startI][0],
                                     adjustedPhonList[stopI][1],
                                     wordList[i]))

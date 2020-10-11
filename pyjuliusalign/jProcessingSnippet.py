@@ -27,12 +27,12 @@ from pyjuliusalign import convertKana
 
 
 class UnidentifiedJapaneseText(Exception):
-    
+
     def __init__(self, sentence, word):
         super(UnidentifiedJapaneseText, self).__init__()
         self.sentence = sentence
         self.word = word
-        
+
     def __str__(self):
         return (u"No match in dictionary for word '%s' in sentence: \n'%s'" %
                 (self.word, self.sentence))
@@ -40,38 +40,39 @@ class UnidentifiedJapaneseText(Exception):
 
 class ChunkingError(Exception):
     '''Raised when a katakana string cannot be parsed correctly'''
+
     def __init__(self, txt):
         super(ChunkingError, self).__init__()
         self.textStr = txt
-        
+
     def __str__(self):
         return u"Chunking error for string: \n %s" % self.textStr
 
 
 class EmptyStrError(Exception):
-    
+
     def __str__(self):
         return "Empty string passed in"
 
 
 class NonKatakanaError(Exception):
-    
+
     def __init__(self, char, utterance):
         super(NonKatakanaError, self).__init__()
         self.char = char
         self.utterance = utterance
-        
+
     def __str__(self):
         return (u"Wrongly interpreted character '%s' as kana in utterance:\n%s"
                 % (unicode(self.char), unicode(self.utterance)))
 
 
 class CabochaNotRunError(Exception):
-    
+
     def __init__(self, cabochaCmd):
         super(CabochaNotRunError, self).__init__()
         self.cabochaCmd = cabochaCmd
-        
+
     def __str__(self):
         return (u"Cabocha not installed or not in path.  "
                 "Attempted to run command:\n%s" % self.cabochaCmd)
@@ -103,6 +104,7 @@ class TextDecodingError(Exception):
                 "fix the problem." %
                 self.encoding)
 
+
 def _formdamage(sent):
     rectify = []
     for ch in sent:
@@ -116,7 +118,7 @@ def _formdamage(sent):
 def cabocha(sentence, cabochaEncoding, cabochaPath=None):
     '''
     Sends the sentence to be processed by cabocha
-    
+
     /cabochaEncoding/ is either 'jis-shift', 'utf-8', or 'euc-jp',
     whichever cabocha was installed with
     '''
@@ -125,15 +127,15 @@ def cabocha(sentence, cabochaEncoding, cabochaPath=None):
         cabochaPath = "cabocha"  # Assumes cabocha is in user path
 
     temp = tempfile.NamedTemporaryFile(delete=False)
-        
+
     try:
         sentence = sentence.encode(cabochaEncoding)
     except:
         sentence = _formdamage(sentence)
-        
+
     temp.write(sentence)
     temp.close()
-    
+
     command = [cabochaPath, '-f', '3', temp.name]
     try:
         process = subprocess.Popen(command, stdout=subprocess.PIPE)
@@ -141,7 +143,7 @@ def cabocha(sentence, cabochaEncoding, cabochaPath=None):
         raise CabochaNotRunError(" ".join(command))
     output = process.communicate()[0]
     os.unlink(temp.name)
-    
+
     try:
         retStr = unicode(output, cabochaEncoding)
     except NameError:  # unicode() does not exist in python 3
@@ -165,7 +167,7 @@ def jReads(target_sent, cabochaEncoding, cabochaPath):
 
     retJReadsToks = []
     retWordList = []
-    
+
     keyList = list(convertKana.kataToRomajiDict.keys())
     validKatakanaList = [u"ャ", u"ュ", u"ョ", u"ッ", u"ァ", u"ィ",
                          u"ゥ", u"ェ", u"ォ", u"ー", ] + keyList
@@ -187,9 +189,9 @@ def jReads(target_sent, cabochaEncoding, cabochaPath):
             word = tok.text.strip()
             if word == "":
                 continue
-            
+
             kana = featureList[-1]
-            
+
             if kana != '*':
                 jReadsToks.append(kana)
             else:
@@ -203,24 +205,24 @@ def jReads(target_sent, cabochaEncoding, cabochaPath):
                     jReadsToks.append(word)
                 else:
                     raise UnidentifiedJapaneseText(target_sent, word)
-                
+
             wordList.append(word)
-            
+
         retJReadsToks.append(jReadsToks)
         retWordList.append(wordList)
 
     return retJReadsToks, retWordList
-    
+
 
 def getChunkedKana(string, cabochaEncoding, cabochaPath):
-    
+
     if string == "":
         raise EmptyStrError()
-    
+
     kanaList, wordList = jReads(string, cabochaEncoding, cabochaPath)
     kanaList = ["".join(subList) for subList in kanaList if len(subList) > 0]
     wordList = ["".join(subList) for subList in wordList if len(subList) > 0]
-    
+
     # Special case - sometimes 'ー' ends up in its own word or at the start
     # of a word, but really it just makes the last vowel longer.  If its
     # by itself, attach it to the previous word
@@ -232,42 +234,42 @@ def getChunkedKana(string, cabochaEncoding, cabochaPath):
             else:
                 retList.append(word)
         return retList
-    
+
     kanaList = mergeTailingVowel(kanaList)
     wordList = mergeTailingVowel(wordList)
-    
+
     vowelList = [u"ア", u"イ", u"ウ", u"エ", u"オ"]
     vowelModifierDict = {u"ァ": u"a", u"ィ": u"i", u"ゥ": u'u',
                          u"ェ": u"e", u"ォ": u'o'}
     yModifierDict = {u"ャ": u"ya", u"ュ": u"yu", u"ョ": u"yo"}
-    
+
     romanjiedTextList = []
     for word in kanaList:
-        
+
         # Sanitize kana
         try:
             kanaInputList = chunkKatakana(word)
         except IndexError:
             raise ChunkingError(word)
-        
+
         # Convert kana to romanji
         romanjiList = []
         for kana in kanaInputList:
-            
+
             # Over-write the previous vowel (foreign words)
             if kana in vowelModifierDict.keys():
                 romanjiList[-1] = (romanjiList[-1][:-1] +
                                    vowelModifierDict[kana])
-                
+
             # Last vowel is a long vowel
             elif kana == u'ー':  # Long vowel
                 # e.g. 'ホーー' becomes "ho::" or 'ふうんー' becomes "hu:n:"
                 #  -- both bad
                 if romanjiList[-1][-1] != ":" and romanjiList[-1][-1] != "N":
                     romanjiList[-1] += ":"
-                
+
                 # Should get recognized as a single vowel by the forced aligner
-            
+
             # Normal case
             else:
                 # Single-phone characters
@@ -283,17 +285,17 @@ def getChunkedKana(string, cabochaEncoding, cabochaPath):
                             syllable = convertKana.kataToRomajiDict[kana]
                         except KeyError:
                             raise NonKatakanaError(kana, string)
-                    
+
                     # The consonant (e.g. 's' or 'sh')
                     romanjiList.append(syllable[:-1])
                     # The vowel
                     romanjiList.append(syllable[-1])
-         
+
         romanjiedTextList.append(" ".join(romanjiList))
-     
+
     return wordList, kanaList, romanjiedTextList
- 
- 
+
+
 def chunkKatakana(kanaStr):
     '''
     Chunks katakana for use in the katakana chart
@@ -314,5 +316,5 @@ def chunkKatakana(kanaStr):
         else:  # Normal case
             returnList.append(kana)
         i += 1
-            
+
     return returnList

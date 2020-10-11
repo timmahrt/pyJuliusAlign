@@ -19,7 +19,7 @@ def parseChart(chartFN):
     """
     with io.open(chartFN, "r", encoding="utf-8") as fd:
         chart = fd.read()
-    
+
     lines = chart.split('\n')
     chartDict = {}
     output = {}
@@ -28,7 +28,7 @@ def parseChart(chartFN):
         cells = line.split()
         for i, c in enumerate(cells[1:]):
             output[c] = cells[0], col_headings[i]
-    
+
     for k in sorted(output.keys()):
         # @k = katakana
         # @r = first romaji in row
@@ -38,7 +38,7 @@ def parseChart(chartFN):
             continue
         romaji = ''.join([item.replace('X', '') for item in [r, c]])
         chartDict[k] = romaji
-    
+
     return chartDict
 
 
@@ -47,13 +47,13 @@ def _invertDict(tmpDict):
     retDict = {}
     for key, value in tmpDict.items():
         retDict[value] = key
-    
+
     return retDict
 
 
 def _getKataToKanaDict():
     retDict = {u"ャ": u"ゃ", u"ュ": u"ゅ", u"ョ": u"ょ", u"ッ": u"っ",
-                u"ァ": u"ぁ", u"ィ": u"ぃ", u"ゥ": u"ぅ", u"ェ": u"ぇ", u"ォ": u"ぉ",
+               u"ァ": u"ぁ", u"ィ": u"ぃ", u"ゥ": u"ぅ", u"ェ": u"ぇ", u"ォ": u"ぉ",
                }
 
     for kata in kataToRomajiDict.keys():
@@ -80,6 +80,7 @@ def convertKanaToKata(inputStr):
         retStr += char
 
     return retStr
+
 
 def convertKataToKana(inputStr):
     '''Input hiragana and return the corresponding string in katakana'''

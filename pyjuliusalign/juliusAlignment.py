@@ -33,7 +33,7 @@ class JuliusRunError(Exception):
         return ("Tried to run julius at location but it does not exist: \n%s"
                 % self.path)
 
-    
+
 class JuliusAlignmentError(Exception):
 
     def __str__(self):
@@ -41,11 +41,11 @@ class JuliusAlignmentError(Exception):
 
 
 class JuliusScriptExecutionFailed(Exception):
-    
+
     def __init__(self, cmdList):
         super(JuliusScriptExecutionFailed, self).__init__()
         self.cmdList = cmdList
-    
+
     def __str__(self):
         errorStr = ("\ Execution Failed.  Please check the following:\n"
                     "- Perl and the julius4.pl script exist in the "
@@ -63,16 +63,16 @@ class JuliusScriptExecutionFailed(Exception):
 
 
 def runJuliusAlignment(resourcePath, juliusScriptPath, perlPath, loggerFd):
-    
+
     if not os.path.exists(juliusScriptPath):
         raise JuliusRunError(juliusScriptPath)
-    
+
     resourcePath = os.path.abspath(resourcePath)
 
     cmdList = [perlPath, juliusScriptPath, resourcePath]
     print(cmdList)
     myProcess = subprocess.Popen(cmdList, stdout=loggerFd)
-    
+
     if myProcess.wait():
         raise JuliusScriptExecutionFailed(cmdList)
 
@@ -126,8 +126,8 @@ def mapJuliusPronunciationToCabocha(juliusPhonesTxt, cabochaPhonesByWord):
                 break
         return returnI
 
-
-    cabochaPhonesByWord = [phones.replace(":", "") for phones in cabochaPhonesByWord]
+    cabochaPhonesByWord = [phones.replace(
+        ":", "") for phones in cabochaPhonesByWord]
     cabochaPhonesTxt = " ".join(cabochaPhonesByWord)
 
     # Mutate cabochaPhonesByWord to contain the same number
@@ -150,7 +150,7 @@ def mapJuliusPronunciationToCabocha(juliusPhonesTxt, cabochaPhonesByWord):
         juliusWordPhones = juliusPhonesTxt[startI: endI]
 
         juliusPhonesByWord.append(juliusWordPhones)
-        startI = endI + 1 # Add 1 space for the space between words
+        startI = endI + 1  # Add 1 space for the space between words
 
     return juliusPhonesByWord
 
@@ -160,26 +160,27 @@ def juliusAlignCabocha(dataList, wavPath, wavFN, juliusScriptPath, soxPath,
                        forceMonophoneAlignFlag):
     '''
     Given utterance-level timing and a wav file, phone-align the audio
-    
+
     dataList is the formatted output of cabocha of the form
     [startTime, endTime, wordList, kanaList, romajiList]
     '''
     tmpOutputPath = join(wavPath, "align_tmp")
     utils.makeDir(tmpOutputPath)
-    
-    logFn = join(tmpOutputPath, 'align_log_' + str(datetime.datetime.now()) + '.txt')
+
+    logFn = join(tmpOutputPath, 'align_log_' +
+                 str(datetime.datetime.now()) + '.txt')
     loggerFd = open(logFn, "w")
 
     utils.makeDir(tmpOutputPath)
-    
+
     tmpTxtFN = join(tmpOutputPath, "tmp.txt")
     tmpWavFN = join(tmpOutputPath, "tmp.wav")
     tmpOutputFN = join(tmpOutputPath, "tmp.lab")
-    
+
     entryDict = {}
     for aspect in [UTTERANCE, WORD, PHONE]:
         entryDict[aspect] = []
-    
+
     # one speech interval at a time
     numTotalPhones = 0
     numPhonesFailedToAlign = 0
@@ -192,17 +193,18 @@ def juliusAlignCabocha(dataList, wavPath, wavFN, juliusScriptPath, soxPath,
         intervalEnd = rowTuple[1]
         line = rowTuple[2]
         wordList = rowTuple[3]
-        kanaList = convertKana.convertKataToKana([char for row in rowTuple[4] for char in row])
+        kanaList = convertKana.convertKataToKana(
+            [char for row in rowTuple[4] for char in row])
         cabochaPhonesByWord = rowTuple[5]
 
         if line.strip() != "":
             entryDict[UTTERANCE].append((str(intervalStart),
                                          str(intervalEnd),
                                          line))
-        
+
         if len([word for word in wordList if word != '']) == 0:
             continue
-        
+
         assert(intervalStart < intervalEnd)
 
         # Create romajiTxt (for forced alignment) and
@@ -211,7 +213,8 @@ def juliusAlignCabocha(dataList, wavPath, wavFN, juliusScriptPath, soxPath,
         tmpRomajiList = []
         tmpFlattenedRomajiList = []
         juliusPhones = yomi2voca.convert(kanaList)
-        juilusPronunciationByWord = mapJuliusPronunciationToCabocha(juliusPhones, cabochaPhonesByWord)
+        juilusPronunciationByWord = mapJuliusPronunciationToCabocha(
+            juliusPhones, cabochaPhonesByWord)
         for row in juilusPronunciationByWord:
             rowList = row.split(" ")
             tmpRomajiList.append(rowList)
@@ -224,24 +227,24 @@ def juliusAlignCabocha(dataList, wavPath, wavFN, juliusScriptPath, soxPath,
         romajiTxt = "".join(kanaList)
         if romajiTxt.strip() == "":
             continue
-        
+
         # Encapsulate each phone string in boundary silence
         #    - in my limited experience, this messes up the output even more
         if silenceFlag:
             romajiTxt = "silB " + romajiTxt + " silE"
-        
+
         # Save temporary transcript and wav files for interval
         with open(tmpTxtFN, "w") as fd:
             fd.write(romajiTxt)
-                
+
         audioScripts.extractSubwav(join(wavPath, wavFN), tmpWavFN,
                                    intervalStart, intervalEnd,
                                    singleChannelFlag=False,
                                    soxPath=soxPath)
-        
+
         # Run forced alignment
         runJuliusAlignment(tmpOutputPath, juliusScriptPath, perlPath, loggerFd)
-        
+
         # Get the output (timestamps for each phone)
         numIntervals += 1
         try:
@@ -272,15 +275,18 @@ def juliusAlignCabocha(dataList, wavPath, wavFN, juliusScriptPath, soxPath,
         phonesSoFar = 0
         for i in range(len(wordList)):
             numPhones = len(tmpRomajiList[i])
-            phoneToWordIndexList.append((phonesSoFar, phonesSoFar + numPhones - 1))
+            phoneToWordIndexList.append(
+                (phonesSoFar, phonesSoFar + numPhones - 1))
             phonesSoFar += numPhones
 
         # If julius uses a silence model and we don't, then adjust our timings
         phoneListFromJulius = [label for _, _, label in adjustedPhonList]
-        if  "silB" in phoneListFromJulius and "silB" not in tmpFlattenedRomajiList:
-            phoneToWordIndexList = [(startI + 1, endI + 1) for startI, endI in phoneToWordIndexList]
+        if "silB" in phoneListFromJulius and "silB" not in tmpFlattenedRomajiList:
+            phoneToWordIndexList = [(startI + 1, endI + 1)
+                                    for startI, endI in phoneToWordIndexList]
             lastI = phoneToWordIndexList[-1][1]
-            phoneToWordIndexList = [(0, 0)] + phoneToWordIndexList + [(lastI + 1, lastI + 1)]
+            phoneToWordIndexList = [
+                (0, 0)] + phoneToWordIndexList + [(lastI + 1, lastI + 1)]
             wordList = [""] + wordList + [""]
 
         # Store the words
@@ -301,21 +307,21 @@ def formatTextForJulius(line, cabochaEncoding, cabochaPath):
     '''Prepares a single line of text, processed by cabocha, for use in julius'''
     unidentifiedUtterance = 0
     unnamedEntity = 0
-        
+
     origLine = line
-    
+
     # Clean up the line before it gets processed
     # Not sure what "・" is but cabocha doesn't like it
     for char in [u"（", u"）", u" ", u"．", u"？", u"「", u"」",
                  u"［", u"］", u"＠Ｗ", u"＠Ｓ", u"＜", u"＞", u" ", u"。"]:
         line = line.replace(char, "")
-    
+
     # Used to split names?
     for char in [u"・", u"·"]:
         line = line.replace(char, " ")
-    
+
     line = line.strip()
-    
+
     try:
         (tmpWordList, tmpKanaList,
          tmpRomajiList) = jProcessingSnippet.getChunkedKana(line,

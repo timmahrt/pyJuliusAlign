@@ -7,10 +7,11 @@
 
 import re
 
+
 def convert(txt):
     '''Input text should be katakana; output text will be phonemes as used in the julius segmentation kit'''
     outputList = []
-    
+
     def replace(txt, replDict):
         i = 0
         for src, tgt in replDict.items():
@@ -153,7 +154,7 @@ twoToOne = {
     'ろぉ': 'r o:',
     'わぁ': 'w a:',
     'をぉ': 'o:',
-    
+
 
     'う゛': 'b u',
     'でぃ': 'd i',
@@ -315,6 +316,6 @@ oneToOne = {
     'っ': 'q',
     'ー': ':',
 
-#その他特別なルール
+    # その他特別なルール
     'を': 'o'
 }

@@ -46,8 +46,9 @@ To get started:
 
 ## Major Revisions
 
-Ver 2.0.5 (October 11, 2020)
-- Fixed a bug preventing the use of triphone models
+Ver 3.0.0 (October 11, 2020)
+- Fixed a bug preventing the use of triphone models.
+- Requires a new python library (python-Levenshtein)
 
 Ver 2.0 (January 12, 2019)
 - pyJuliusAlign now works with the latest version of Julius and the Julius Segmentation Kit.
@@ -64,6 +65,9 @@ Ver 1.0 (September 2, 2014)
 ## Requirements
 
 python - https://www.python.org/
+
+python-Levenshtein
+- https://github.com/ztane/python-Levenshtein
 
 pyPraat - https://github.com/timmahrt/pyPraat
  - for textgrid manipulations

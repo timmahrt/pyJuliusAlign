@@ -69,7 +69,7 @@ python - https://www.python.org/
 python-Levenshtein
 - https://github.com/ztane/python-Levenshtein
 
-pyPraat - https://github.com/timmahrt/pyPraat
+praatIO - https://github.com/timmahrt/praatIO
  - for textgrid manipulations
 
 Julius - https://github.com/julius-speech/julius

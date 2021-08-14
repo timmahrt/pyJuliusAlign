@@ -17,7 +17,6 @@ All other code is from me
 """
 
 import os
-from os.path import join
 import subprocess
 import tempfile
 

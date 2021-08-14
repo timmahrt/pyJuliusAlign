@@ -33,7 +33,7 @@ perlPath = "/opt/local/bin/perl"
 
 # One of: 'jis-shift', 'utf-8', or 'euc-jp'
 # Whichever cabocha was installed with
-cabochaEncoding = "euc-jp"
+cabochaEncoding = "euc-jp"  # "utf-8" is nice if possible
 
 # Use this to convert your textgrids to .txt files which are used by julius
 # If you do not have textgrids or you already have text transcripts, skip this step

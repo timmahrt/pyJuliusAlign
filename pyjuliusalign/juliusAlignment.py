@@ -125,6 +125,8 @@ def mapJuliusPronunciationToCabocha(juliusPhonesTxt, cabochaPhonesByWord):
         return returnI
 
     cabochaPhonesByWord = [phones.replace(":", "") for phones in cabochaPhonesByWord]
+    # TODO: 'w' is treated as a phone but its not--should this logic live elsewhere?
+    cabochaPhonesByWord = [phones.replace("w o", "o") for phones in cabochaPhonesByWord]
     cabochaPhonesTxt = " ".join(cabochaPhonesByWord)
 
     # Mutate cabochaPhonesByWord to contain the same number

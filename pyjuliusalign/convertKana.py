@@ -1,4 +1,3 @@
-
 import io
 import os
 from os.path import join
@@ -20,7 +19,7 @@ def parseChart(chartFN):
     with io.open(chartFN, "r", encoding="utf-8") as fd:
         chart = fd.read()
 
-    lines = chart.split('\n')
+    lines = chart.split("\n")
     chartDict = {}
     output = {}
     col_headings = lines.pop(0).split()
@@ -34,16 +33,16 @@ def parseChart(chartFN):
         # @r = first romaji in row
         # @c = concatinating romaji in column
         r, c = output[k]
-        if k == 'X':
+        if k == "X":
             continue
-        romaji = ''.join([item.replace('X', '') for item in [r, c]])
+        romaji = "".join([item.replace("X", "") for item in [r, c]])
         chartDict[k] = romaji
 
     return chartDict
 
 
 def _invertDict(tmpDict):
-    '''Flips key-value relationship in a dictionary'''
+    """Flips key-value relationship in a dictionary"""
     retDict = {}
     for key, value in tmpDict.items():
         retDict[value] = key
@@ -52,9 +51,17 @@ def _invertDict(tmpDict):
 
 
 def _getKataToKanaDict():
-    retDict = {u"ャ": u"ゃ", u"ュ": u"ゅ", u"ョ": u"ょ", u"ッ": u"っ",
-               u"ァ": u"ぁ", u"ィ": u"ぃ", u"ゥ": u"ぅ", u"ェ": u"ぇ", u"ォ": u"ぉ",
-               }
+    retDict = {
+        u"ャ": u"ゃ",
+        u"ュ": u"ゅ",
+        u"ョ": u"ょ",
+        u"ッ": u"っ",
+        u"ァ": u"ぁ",
+        u"ィ": u"ぃ",
+        u"ゥ": u"ぅ",
+        u"ェ": u"ぇ",
+        u"ォ": u"ぉ",
+    }
 
     for kata in kataToRomajiDict.keys():
         kana = romajiToKanaDict[kataToRomajiDict[kata]]
@@ -72,7 +79,7 @@ kanaToKataDict = _invertDict(kataToKanaDict)
 
 
 def convertKanaToKata(inputStr):
-    '''Input hiragana and return the corresponding string in katakana'''
+    """Input hiragana and return the corresponding string in katakana"""
     retStr = u""
     for char in inputStr:
         if char in kanaToKataDict.keys():
@@ -83,7 +90,7 @@ def convertKanaToKata(inputStr):
 
 
 def convertKataToKana(inputStr):
-    '''Input hiragana and return the corresponding string in katakana'''
+    """Input hiragana and return the corresponding string in katakana"""
     retStr = u""
     for char in inputStr:
         if char in kataToKanaDict.keys():

@@ -1,8 +1,8 @@
-'''
+"""
 Created on Aug 29, 2014
 
 @author: tmahrt
-'''
+"""
 
 import os
 from os.path import join
@@ -17,22 +17,23 @@ DEFAULT_FRAMERATE = 16000
 
 
 class IncompatibleSampleFrequencyError(Exception):
-
     def __init__(self, actualSamplingRate, targetSamplingRate):
         super(IncompatibleSampleFrequencyError, self).__init__()
         self.actualSR = actualSamplingRate
         self.targetSR = targetSamplingRate
 
     def __str__(self):
-        return ("File's sampling rate=%s but system requires=%s\n "
-                "Please resample audio files or ensure that sox is in "
-                "your path" % (self.actualSR, self.targetSR))
+        return (
+            "File's sampling rate=%s but system requires=%s\n "
+            "Please resample audio files or ensure that sox is in "
+            "your path" % (self.actualSR, self.targetSR)
+        )
 
 
 def getSoundFileDuration(fn):
-    '''
+    """
     Returns the duration of a wav file (in seconds)
-    '''
+    """
     audiofile = wave.open(fn, "r")
 
     params = audiofile.getparams()
@@ -67,13 +68,11 @@ def extractSubwav(fn, outputFN, startT, endT, singleChannelFlag, soxPath=None):
         if not os.path.exists(resampledFN):
             utils.makeDir(resampledAudioPath)
             sr = str(DEFAULT_FRAMERATE)
-            soxCmd = "%s %s -r %s %s rate -v 96k" % (soxPath, fn, sr,
-                                                     resampledFN)
+            soxCmd = "%s %s -r %s %s rate -v 96k" % (soxPath, fn, sr, resampledFN)
             os.system(soxCmd)
 
         if not os.path.exists(resampledFN):
-            raise IncompatibleSampleFrequencyError(framerate,
-                                                   DEFAULT_FRAMERATE)
+            raise IncompatibleSampleFrequencyError(framerate, DEFAULT_FRAMERATE)
 
         audiofile = wave.open(resampledFN, "r")
         params = audiofile.getparams()
@@ -92,8 +91,7 @@ def extractSubwav(fn, outputFN, startT, endT, singleChannelFlag, soxPath=None):
         audioFrames = audioop.tomono(audioFrames, sampwidth, 1, 0)
         nchannels = 1
 
-    outParams = [nchannels, sampwidth, framerate, len(audioFrames),
-                 comptype, compname]
+    outParams = [nchannels, sampwidth, framerate, len(audioFrames), comptype, compname]
 
     outWave = wave.open(outputFN, "w")
     outWave.setparams(outParams)
@@ -121,12 +119,20 @@ def splitStereoAudio(path, fn, outputPath=None):
     nframes = params[3]
     audioFrames = audiofile.readframes(nframes)
 
-    for leftFactor, rightFactor, outputFN in ((1, 0, leftOutputFN),
-                                              (0, 1, rightOutputFN)):
+    for leftFactor, rightFactor, outputFN in (
+        (1, 0, leftOutputFN),
+        (0, 1, rightOutputFN),
+    ):
 
-        monoAudioFrames = audioop.tomono(audioFrames, sampwidth,
-                                         leftFactor, rightFactor)
-        params = tuple([1, ] + list(params[1:]))
+        monoAudioFrames = audioop.tomono(
+            audioFrames, sampwidth, leftFactor, rightFactor
+        )
+        params = tuple(
+            [
+                1,
+            ]
+            + list(params[1:])
+        )
 
         outputAudiofile = wave.open(outputFN, "w")
         outputAudiofile.setparams(params)

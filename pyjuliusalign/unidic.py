@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-'''
+"""
 Created on Aug 19, 2014
 
 @author: tmahrt
-'''
+"""
 
 from os.path import join
 import cPickle
@@ -11,9 +11,9 @@ import io
 
 
 class UnidicTool(object):
-    '''
+    """
     A Japanese pronunciation dictionary developed by Ninjal
-    '''
+    """
 
     def __init__(self, unidicPath):
         self.data = None
@@ -36,7 +36,7 @@ class UnidicTool(object):
             except ValueError:
                 break
 
-            matchList.append(self.data[matchI + len(word) + 1:endI].split(','))
+            matchList.append(self.data[matchI + len(word) + 1 : endI].split(","))
             startI = matchI
 
         return matchList

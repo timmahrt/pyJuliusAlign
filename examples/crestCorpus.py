@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
-'''
+"""
 Created on Aug 6, 2014
 
 @author: tmahrt
 
 I don't recall the details of this file, but apparently I used
 the force aligner with the crest corpus. Maybe its useful as an example.
-'''
+"""
 
 import sys
+
 reload(sys)
 sys.setdefaultencoding("utf-8")
 sys.path.append("/Users/tmahrt/Dropbox/workspace/Thesis/")
@@ -24,6 +25,7 @@ from pyjuliusalign import audioScripts
 
 from praatio import tgio
 
+
 def convertCorpusToUTF8(path):
 
     outputDir = join(path, "output")
@@ -33,12 +35,13 @@ def convertCorpusToUTF8(path):
         # cp932 = Japanese
         with io.open(join(path, fn), "rU", encoding="cp932") as fd:
             text = fd.read()
-        with io.open(join(outputDir, fn), "w", encoding='utf-8') as fd:
+        with io.open(join(outputDir, fn), "w", encoding="utf-8") as fd:
             fd.write(text)
 
 
-def convertCRESTToKanaAndRomaji(inputPath, outputPath, cabochaEncoding,
-                                cabochaPath, encoding="cp932"):
+def convertCRESTToKanaAndRomaji(
+    inputPath, outputPath, cabochaEncoding, cabochaPath, encoding="cp932"
+):
 
     timeInfoPath = join(outputPath, "speaker_info_and_utterance_timing")
 
@@ -48,8 +51,9 @@ def convertCRESTToKanaAndRomaji(inputPath, outputPath, cabochaEncoding,
     numUnnamedEntities = 0
     numUnidentifiedUtterances = 0
     finishedList = utils.findFiles(timeInfoPath, filterExt=".txt")
-    for fn in utils.findFiles(inputPath, filterExt=".txt",
-                              skipIfNameInList=finishedList):
+    for fn in utils.findFiles(
+        inputPath, filterExt=".txt", skipIfNameInList=finishedList
+    ):
         with io.open(join(inputPath, fn), "r", encoding=encoding) as fd:
             text = fd.read()
         textList = text.split("\n")
@@ -68,8 +72,23 @@ def convertCRESTToKanaAndRomaji(inputPath, outputPath, cabochaEncoding,
 
             # Clean up the line before it gets processed
             # Not sure what "・" is but cabocha doesn't like it
-            for char in [u"（", u"）", u" ", u"．", u"？", u"「", u"」",
-                         u"［", u"］", u"＠Ｗ", u"＠Ｓ", u"＜", u"＞", u" ", u"。"]:
+            for char in [
+                u"（",
+                u"）",
+                u" ",
+                u"．",
+                u"？",
+                u"「",
+                u"」",
+                u"［",
+                u"］",
+                u"＠Ｗ",
+                u"＠Ｓ",
+                u"＜",
+                u"＞",
+                u" ",
+                u"。",
+            ]:
                 line = line.replace(char, "")
 
             # Used to split names?
@@ -79,11 +98,14 @@ def convertCRESTToKanaAndRomaji(inputPath, outputPath, cabochaEncoding,
             line = line.strip()
 
             try:
-                tmp = jProcessingSnippet.getChunkedKana(line, cabochaEncoding,
-                                                        cabochaPath)
+                tmp = jProcessingSnippet.getChunkedKana(
+                    line, cabochaEncoding, cabochaPath
+                )
                 tmpWordList, tmpKanaList, tmpromajiList = tmp
-            except (jProcessingSnippet.ChunkingError,
-                    jProcessingSnippet.NonKatakanaError) as e:
+            except (
+                jProcessingSnippet.ChunkingError,
+                jProcessingSnippet.NonKatakanaError,
+            ) as e:
                 print(u"%s, %s" % (str(e), origLine))
                 tmpWordList = [""]
                 tmpKanaList = [""]
@@ -106,18 +128,23 @@ def convertCRESTToKanaAndRomaji(inputPath, outputPath, cabochaEncoding,
                 print(line)
                 raise
             line = line.replace(u",", u"")
-            outputList = [u"%s,%s,%s" % (speakerCode, startTime, stopTime),
-                          origLine, ','.join(tmpWordList),
-                          ",".join(tmpKanaList), ",".join(tmpromajiList)]
+            outputList = [
+                u"%s,%s,%s" % (speakerCode, startTime, stopTime),
+                origLine,
+                ",".join(tmpWordList),
+                ",".join(tmpKanaList),
+                ",".join(tmpromajiList),
+            ]
             outputStr = ";".join(outputList)
 
             speakerInfoList.append(outputStr)
 
         print(fn)
-        print("Number of unnamed entities for fn: %d" %
-              numUnnamedEntitiesForFN)
-        print("Number of unidentified utterances for fn: %d" %
-              numUnidentifiedUtterancesForFN)
+        print("Number of unnamed entities for fn: %d" % numUnnamedEntitiesForFN)
+        print(
+            "Number of unidentified utterances for fn: %d"
+            % numUnidentifiedUtterancesForFN
+        )
         numUnnamedEntities += numUnnamedEntitiesForFN
         numUnidentifiedUtterances += numUnidentifiedUtterancesForFN
 
@@ -130,21 +157,23 @@ def convertCRESTToKanaAndRomaji(inputPath, outputPath, cabochaEncoding,
     print("Number of unidentified utterances: %d" % numUnidentifiedUtterances)
 
 
-def forceAlignFile(wavPath, wavName, txtPath, txtFN, outputPath,
-                   juliusScriptPath, soxPath):
-    '''
-    '''
+def forceAlignFile(
+    wavPath, wavName, txtPath, txtFN, outputPath, juliusScriptPath, soxPath
+):
+    """"""
 
     utils.makeDir(outputPath)
 
-    wavFNDict = {"L": wavName + "_L.wav",
-                 "R": wavName + "_R.wav"}
+    wavFNDict = {"L": wavName + "_L.wav", "R": wavName + "_R.wav"}
 
     # Formatted output of cabocha
     data = open(join(txtPath, txtFN), "rU").read()
     dataList = data.split("\n")
-    dataList = [[subRow.split(",") for subRow in row.split(";")]
-                for row in dataList if row != ""]
+    dataList = [
+        [subRow.split(",") for subRow in row.split(";")]
+        for row in dataList
+        if row != ""
+    ]
 
     dataDict = {"L": [], "R": []}
     for timingInfo, line, wordList, kanaList, romajiList in dataList:
@@ -152,11 +181,15 @@ def forceAlignFile(wavPath, wavName, txtPath, txtFN, outputPath,
         line = ",".join(line)
 
         speaker, startTimeStr, endTimeStr = timingInfo
-        speaker, startTime, endTime = (speaker.strip(), float(startTimeStr),
-                                       float(endTimeStr))
+        speaker, startTime, endTime = (
+            speaker.strip(),
+            float(startTimeStr),
+            float(endTimeStr),
+        )
 
-        dataDict[speaker].append([startTime, endTime, line, wordList,
-                                  kanaList, romajiList])
+        dataDict[speaker].append(
+            [startTime, endTime, line, wordList, kanaList, romajiList]
+        )
 
     speakerEntryDict = {}
     numPhonesFailedAlignment = 0
@@ -164,11 +197,16 @@ def forceAlignFile(wavPath, wavName, txtPath, txtFN, outputPath,
     numFailedIntervals = 0
     numIntervals = 0
     for speaker in ["L", "R"]:
-        tmp = juliusAlignment.juliusAlignCabocha(dataDict[speaker], wavPath,
-                                                 wavFNDict[speaker],
-                                                 juliusScriptPath,
-                                                 soxPath,
-                                                 False, True, True)
+        tmp = juliusAlignment.juliusAlignCabocha(
+            dataDict[speaker],
+            wavPath,
+            wavFNDict[speaker],
+            juliusScriptPath,
+            soxPath,
+            False,
+            True,
+            True,
+        )
         speakerEntryDict[speaker], statList = tmp
         numPhonesFailedAlignment += statList[0]
         numPhones += statList[1]
@@ -177,23 +215,24 @@ def forceAlignFile(wavPath, wavName, txtPath, txtFN, outputPath,
 
     # Create tiers and textgrids
     tg = tgio.Textgrid()
-    maxDuration = audioScripts.getSoundFileDuration(join(wavPath,
-                                                         wavName + "_L.wav"))
+    maxDuration = audioScripts.getSoundFileDuration(join(wavPath, wavName + "_L.wav"))
     for speaker in ["L", "R"]:
-        for aspect in [juliusAlignment.UTTERANCE, juliusAlignment.WORD,
-                       juliusAlignment.PHONE]:
+        for aspect in [
+            juliusAlignment.UTTERANCE,
+            juliusAlignment.WORD,
+            juliusAlignment.PHONE,
+        ]:
 
             tierName = "%s_%s" % (aspect, speaker)
 
-            tier = tgio.IntervalTier(tierName,
-                                     speakerEntryDict[speaker][aspect],
-                                     minT=0, maxT=maxDuration)
+            tier = tgio.IntervalTier(
+                tierName, speakerEntryDict[speaker][aspect], minT=0, maxT=maxDuration
+            )
             tg.addTier(tier)
 
     tg.save(join(outputPath, wavName + ".TextGrid"))
 
-    return (numPhonesFailedAlignment, numPhones,
-            numFailedIntervals, numIntervals)
+    return (numPhonesFailedAlignment, numPhones, numFailedIntervals, numIntervals)
 
 
 def forceAlignCrest(wavPath, txtPath, outputPath, juliusScriptPath, soxPath):
@@ -204,24 +243,35 @@ def forceAlignCrest(wavPath, txtPath, outputPath, juliusScriptPath, soxPath):
     totalNumIntervalsFailed = 0
     totalNumIntervals = 0
 
-    finishedList = utils.findFiles(outputPath, filterExt=".TextGrid",
-                                   stripExt=True)
-    for name in utils.findFiles(txtPath, filterExt=".txt",
-                                skipIfNameInList=finishedList, stripExt=True):
+    finishedList = utils.findFiles(outputPath, filterExt=".TextGrid", stripExt=True)
+    for name in utils.findFiles(
+        txtPath, filterExt=".txt", skipIfNameInList=finishedList, stripExt=True
+    ):
 
-        (numPhonesFailedAlignment, numPhones, numFailedIntervals,
-         numIntervals) = forceAlignFile(wavPath, name, txtPath,
-                                        name + ".txt", outputPath,
-                                        juliusScriptPath, soxPath)
+        (
+            numPhonesFailedAlignment,
+            numPhones,
+            numFailedIntervals,
+            numIntervals,
+        ) = forceAlignFile(
+            wavPath, name, txtPath, name + ".txt", outputPath, juliusScriptPath, soxPath
+        )
 
-        percentFailed = utils.divide(numPhonesFailedAlignment,
-                                     numPhones, 0) * 100
-        percentFailedIntervals = utils.divide(numFailedIntervals,
-                                              numIntervals, 0) * 100
-        print("%d intervals of %d total intervals (%0.2f%%) and %d phones "
-              "of %d total phones (%0.2f%%) failed to align for %s" %
-              (numFailedIntervals, numIntervals, percentFailedIntervals,
-               numPhonesFailedAlignment, numPhones, percentFailed, name))
+        percentFailed = utils.divide(numPhonesFailedAlignment, numPhones, 0) * 100
+        percentFailedIntervals = utils.divide(numFailedIntervals, numIntervals, 0) * 100
+        print(
+            "%d intervals of %d total intervals (%0.2f%%) and %d phones "
+            "of %d total phones (%0.2f%%) failed to align for %s"
+            % (
+                numFailedIntervals,
+                numIntervals,
+                percentFailedIntervals,
+                numPhonesFailedAlignment,
+                numPhones,
+                percentFailed,
+                name,
+            )
+        )
 
         totalNumPhonesFailed += numPhonesFailedAlignment
         totalNumPhones += numPhones
@@ -229,16 +279,23 @@ def forceAlignCrest(wavPath, txtPath, outputPath, juliusScriptPath, soxPath):
         totalNumIntervalsFailed += numFailedIntervals
         totalNumIntervals += numIntervals
 
-    totalPercentFailed = utils.divide(totalNumPhonesFailed,
-                                      totalNumPhones, 0) * 100
-    totalPercentFailedIntervals = utils.divide(totalNumIntervalsFailed,
-                                               totalNumIntervals, 0) * 100
+    totalPercentFailed = utils.divide(totalNumPhonesFailed, totalNumPhones, 0) * 100
+    totalPercentFailedIntervals = (
+        utils.divide(totalNumIntervalsFailed, totalNumIntervals, 0) * 100
+    )
     print("====Summary====")
-    print("%d intervals of %d total intervals (%0.2f%%) and %d phones of %d "
-          "total phones (%0.2f%%) failed to align" %
-          (totalNumIntervalsFailed, totalNumIntervals,
-           totalPercentFailedIntervals, totalNumPhonesFailed,
-           totalNumPhones, totalPercentFailed))
+    print(
+        "%d intervals of %d total intervals (%0.2f%%) and %d phones of %d "
+        "total phones (%0.2f%%) failed to align"
+        % (
+            totalNumIntervalsFailed,
+            totalNumIntervals,
+            totalPercentFailedIntervals,
+            totalNumPhonesFailed,
+            totalNumPhones,
+            totalPercentFailed,
+        )
+    )
 
 
 def renameMP3Files(path):
@@ -249,8 +306,7 @@ def renameMP3Files(path):
     for name in utils.findFiles(path, filterExt=".mp3", stripExt=True):
         if name[-1] == "x":
             newName = name[:-1]
-            shutil.move(join(path, name + ".mp3"),
-                        join(outputPath, newName + ".mp3"))
+            shutil.move(join(path, name + ".mp3"), join(outputPath, newName + ".mp3"))
 
 
 def splitAudio(path):
@@ -274,8 +330,7 @@ def getSelectedTxtFiles(txtPath, wavPath):
     for name in utils.findFiles(txtPath, filterExt=".txt", stripExt=True):
         if name not in nameList:
             continue
-        shutil.copy(join(txtPath, name + ".txt"),
-                    join(outputPath, name + ".txt"))
+        shutil.copy(join(txtPath, name + ".txt"), join(outputPath, name + ".txt"))
 
 
 if __name__ == "__main__":
@@ -286,29 +341,30 @@ if __name__ == "__main__":
     convertCorpusToUTF8("/Users/tmahrt/Downloads/railroad")
 
     _path = "/Users/tmahrt/Desktop/experiments/Kobe_corpus/features/txt"
-#     readCorpus(path)
+    #     readCorpus(path)
 
     _outputPath = "/Users/tmahrt/Desktop/experiments/Kobe_corpus/features"
-    convertCRESTToKanaAndRomaji(_path, _outputPath, _cabochaEncoding,
-                                _cabochaPath)
+    convertCRESTToKanaAndRomaji(_path, _outputPath, _cabochaEncoding, _cabochaPath)
 
     _wavPath = "/Users/tmahrt/Desktop/experiments/Kobe_corpus/features/wavs"
-    _txtPath = ("/Users/tmahrt/Desktop/experiments/Kobe_corpus/features/"
-                "speaker_info_and_utterance_timing")
-    _outputPath = ("/Users/tmahrt/Desktop/experiments/Kobe_corpus/features/"
-                   "textgrids")
-#     outputPath = "/Users/tmahrt/Desktop/experiments/Kobe_corpus/mp3/wav16k"
-    forceAlignCrest(_wavPath, _txtPath, _outputPath,
-                    _juliusScriptPath, _soxPath)
+    _txtPath = (
+        "/Users/tmahrt/Desktop/experiments/Kobe_corpus/features/"
+        "speaker_info_and_utterance_timing"
+    )
+    _outputPath = "/Users/tmahrt/Desktop/experiments/Kobe_corpus/features/" "textgrids"
+    #     outputPath = "/Users/tmahrt/Desktop/experiments/Kobe_corpus/mp3/wav16k"
+    forceAlignCrest(_wavPath, _txtPath, _outputPath, _juliusScriptPath, _soxPath)
 
     _mp3Path = "/Users/tmahrt/Desktop/mp3_files"
-#     renameMP3Files(mp3Path)
+    #     renameMP3Files(mp3Path)
 
     _wavPath = "/Users/tmahrt/Desktop/experiments/Kobe_corpus/mp3/wav16k"
-#     splitAudio(path)
+    #     splitAudio(path)
 
     _txtPath = "/Users/tmahrt/Desktop/experiments/Kobe_corpus/txt"
-    _txtPath = ("/Users/tmahrt/Desktop/experiments/Kobe_corpus/features/"
-                "speaker_info_and_utterance_timing")
+    _txtPath = (
+        "/Users/tmahrt/Desktop/experiments/Kobe_corpus/features/"
+        "speaker_info_and_utterance_timing"
+    )
     _wavPath = "/Users/tmahrt/Desktop/experiments/Kobe_corpus/features/wavs"
 #     getSelectedTxtFiles(txtPath, wavPath)

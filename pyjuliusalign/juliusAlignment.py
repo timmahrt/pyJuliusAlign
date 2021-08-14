@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-'''
+"""
 Created on Aug 20, 2014
 
 @author: tmahrt
-'''
+"""
 
 import os
 from os.path import join
@@ -24,40 +24,38 @@ UTTERANCE = "utterances"
 
 
 class JuliusRunError(Exception):
-
     def __init__(self, juliusPath):
         super(JuliusRunError, self).__init__()
         self.path = juliusPath
 
     def __str__(self):
-        return ("Tried to run julius at location but it does not exist: \n%s"
-                % self.path)
+        return "Tried to run julius at location but it does not exist: \n%s" % self.path
 
 
 class JuliusAlignmentError(Exception):
-
     def __str__(self):
         return "Failed to align: "
 
 
 class JuliusScriptExecutionFailed(Exception):
-
     def __init__(self, cmdList):
         super(JuliusScriptExecutionFailed, self).__init__()
         self.cmdList = cmdList
 
     def __str__(self):
-        errorStr = ("\ Execution Failed.  Please check the following:\n"
-                    "- Perl and the julius4.pl script exist in the "
-                    "locations specified\n"
-                    "- you have edited the 'user configuration' part of "
-                    "'segment_julius4.pl'\n"
-                    "- script arguments are correct\n\n"
-                    "If you can't locate the problem, I recommend using "
-                    "absolute paths rather than relative "
-                    "paths and using paths without spaces in any folder "
-                    "or file names\n\n"
-                    "Here is the command that python attempted to run:\n")
+        errorStr = (
+            "\ Execution Failed.  Please check the following:\n"
+            "- Perl and the julius4.pl script exist in the "
+            "locations specified\n"
+            "- you have edited the 'user configuration' part of "
+            "'segment_julius4.pl'\n"
+            "- script arguments are correct\n\n"
+            "If you can't locate the problem, I recommend using "
+            "absolute paths rather than relative "
+            "paths and using paths without spaces in any folder "
+            "or file names\n\n"
+            "Here is the command that python attempted to run:\n"
+        )
         cmdTxt = " ".join(self.cmdList)
         return errorStr + cmdTxt
 
@@ -96,7 +94,7 @@ def parseJuliusOutput(juliusOutputFn):
 
 
 def mapJuliusPronunciationToCabocha(juliusPhonesTxt, cabochaPhonesByWord):
-    '''
+    """
     Aligns the phones in a julius pronunciation list into phones chunked into words by cabocha
 
     The phonetisation is a little different, so the mapping tries to do so gracefully.
@@ -106,7 +104,7 @@ def mapJuliusPronunciationToCabocha(juliusPhonesTxt, cabochaPhonesByWord):
     those edits.
     Once the two strings contain the same number of phones, dump the phones from julius into the slots for
     the phones inside of the modified cabocha words.
-    '''
+    """
 
     def _buildWordIndicies(cabochaPhonesByWord):
         startI = 0
@@ -126,8 +124,7 @@ def mapJuliusPronunciationToCabocha(juliusPhonesTxt, cabochaPhonesByWord):
                 break
         return returnI
 
-    cabochaPhonesByWord = [phones.replace(
-        ":", "") for phones in cabochaPhonesByWord]
+    cabochaPhonesByWord = [phones.replace(":", "") for phones in cabochaPhonesByWord]
     cabochaPhonesTxt = " ".join(cabochaPhonesByWord)
 
     # Mutate cabochaPhonesByWord to contain the same number
@@ -136,10 +133,10 @@ def mapJuliusPronunciationToCabocha(juliusPhonesTxt, cabochaPhonesByWord):
     wordIndicies = _buildWordIndicies(cabochaPhonesByWord)
     for operation, startIndex, _ in edits:
         wordI = _getWordForCharIndex(wordIndicies, startIndex)
-        if operation == 'delete':
+        if operation == "delete":
             cabochaPhonesByWord[wordI] = cabochaPhonesByWord[wordI][:-1]
-        elif operation == 'insert':
-            cabochaPhonesByWord[wordI] += '-'
+        elif operation == "insert":
+            cabochaPhonesByWord[wordI] += "-"
 
     # Chunk juliusPhonesByWord according to the number
     # of phones in the now aligned cabochaPhonesByWord
@@ -147,7 +144,7 @@ def mapJuliusPronunciationToCabocha(juliusPhonesTxt, cabochaPhonesByWord):
     startI = 0
     for wordNum, phones in enumerate(cabochaPhonesByWord):
         endI = startI + len(phones)
-        juliusWordPhones = juliusPhonesTxt[startI: endI]
+        juliusWordPhones = juliusPhonesTxt[startI:endI]
 
         juliusPhonesByWord.append(juliusWordPhones)
         startI = endI + 1  # Add 1 space for the space between words
@@ -155,20 +152,27 @@ def mapJuliusPronunciationToCabocha(juliusPhonesTxt, cabochaPhonesByWord):
     return juliusPhonesByWord
 
 
-def juliusAlignCabocha(dataList, wavPath, wavFN, juliusScriptPath, soxPath,
-                       perlPath, silenceFlag, forceEndTimeFlag,
-                       forceMonophoneAlignFlag):
-    '''
+def juliusAlignCabocha(
+    dataList,
+    wavPath,
+    wavFN,
+    juliusScriptPath,
+    soxPath,
+    perlPath,
+    silenceFlag,
+    forceEndTimeFlag,
+    forceMonophoneAlignFlag,
+):
+    """
     Given utterance-level timing and a wav file, phone-align the audio
 
     dataList is the formatted output of cabocha of the form
     [startTime, endTime, wordList, kanaList, romajiList]
-    '''
+    """
     tmpOutputPath = join(wavPath, "align_tmp")
     utils.makeDir(tmpOutputPath)
 
-    logFn = join(tmpOutputPath, 'align_log_' +
-                 str(datetime.datetime.now()) + '.txt')
+    logFn = join(tmpOutputPath, "align_log_" + str(datetime.datetime.now()) + ".txt")
     loggerFd = open(logFn, "w")
 
     utils.makeDir(tmpOutputPath)
@@ -194,18 +198,17 @@ def juliusAlignCabocha(dataList, wavPath, wavFN, juliusScriptPath, soxPath,
         line = rowTuple[2]
         wordList = rowTuple[3]
         kanaList = convertKana.convertKataToKana(
-            [char for row in rowTuple[4] for char in row])
+            [char for row in rowTuple[4] for char in row]
+        )
         cabochaPhonesByWord = rowTuple[5]
 
         if line.strip() != "":
-            entryDict[UTTERANCE].append((str(intervalStart),
-                                         str(intervalEnd),
-                                         line))
+            entryDict[UTTERANCE].append((str(intervalStart), str(intervalEnd), line))
 
-        if len([word for word in wordList if word != '']) == 0:
+        if len([word for word in wordList if word != ""]) == 0:
             continue
 
-        assert(intervalStart < intervalEnd)
+        assert intervalStart < intervalEnd
 
         # Create romajiTxt (for forced alignment) and
         # phoneList (for the textgrid)
@@ -214,7 +217,8 @@ def juliusAlignCabocha(dataList, wavPath, wavFN, juliusScriptPath, soxPath,
         tmpFlattenedRomajiList = []
         juliusPhones = yomi2voca.convert(kanaList)
         juilusPronunciationByWord = mapJuliusPronunciationToCabocha(
-            juliusPhones, cabochaPhonesByWord)
+            juliusPhones, cabochaPhonesByWord
+        )
         for row in juilusPronunciationByWord:
             rowList = row.split(" ")
             tmpRomajiList.append(rowList)
@@ -237,10 +241,14 @@ def juliusAlignCabocha(dataList, wavPath, wavFN, juliusScriptPath, soxPath,
         with open(tmpTxtFN, "w") as fd:
             fd.write(romajiTxt)
 
-        audioScripts.extractSubwav(join(wavPath, wavFN), tmpWavFN,
-                                   intervalStart, intervalEnd,
-                                   singleChannelFlag=False,
-                                   soxPath=soxPath)
+        audioScripts.extractSubwav(
+            join(wavPath, wavFN),
+            tmpWavFN,
+            intervalStart,
+            intervalEnd,
+            singleChannelFlag=False,
+            soxPath=soxPath,
+        )
 
         # Run forced alignment
         runJuliusAlignment(tmpOutputPath, juliusScriptPath, perlPath, loggerFd)
@@ -256,12 +264,16 @@ def juliusAlignCabocha(dataList, wavPath, wavFN, juliusScriptPath, soxPath,
             else:
                 numPhonesFailedToAlign += numWords
                 numFailedIntervals += 1
-                print("Failed to align: %s - %f - %f" %
-                      ("".join(romajiList), intervalStart, intervalEnd))
+                print(
+                    "Failed to align: %s - %f - %f"
+                    % ("".join(romajiList), intervalStart, intervalEnd)
+                )
                 continue
 
-        adjustedPhonList = [[intervalStart + start, intervalStart + stop, label]
-                            for start, stop, label in matchList]
+        adjustedPhonList = [
+            [intervalStart + start, intervalStart + stop, label]
+            for start, stop, label in matchList
+        ]
 
         # Julius is conservative in estimating the final vowel.  Stretch it
         # to be the length of the utterance
@@ -275,36 +287,41 @@ def juliusAlignCabocha(dataList, wavPath, wavFN, juliusScriptPath, soxPath,
         phonesSoFar = 0
         for i in range(len(wordList)):
             numPhones = len(tmpRomajiList[i])
-            phoneToWordIndexList.append(
-                (phonesSoFar, phonesSoFar + numPhones - 1))
+            phoneToWordIndexList.append((phonesSoFar, phonesSoFar + numPhones - 1))
             phonesSoFar += numPhones
 
         # If julius uses a silence model and we don't, then adjust our timings
         phoneListFromJulius = [label for _, _, label in adjustedPhonList]
         if "silB" in phoneListFromJulius and "silB" not in tmpFlattenedRomajiList:
-            phoneToWordIndexList = [(startI + 1, endI + 1)
-                                    for startI, endI in phoneToWordIndexList]
-            lastI = phoneToWordIndexList[-1][1]
             phoneToWordIndexList = [
-                (0, 0)] + phoneToWordIndexList + [(lastI + 1, lastI + 1)]
+                (startI + 1, endI + 1) for startI, endI in phoneToWordIndexList
+            ]
+            lastI = phoneToWordIndexList[-1][1]
+            phoneToWordIndexList = (
+                [(0, 0)] + phoneToWordIndexList + [(lastI + 1, lastI + 1)]
+            )
             wordList = [""] + wordList + [""]
 
         # Store the words
         for i in range(len(wordList)):
             startI, stopI = phoneToWordIndexList[i]
-            entryDict[WORD].append((adjustedPhonList[startI][0],
-                                    adjustedPhonList[stopI][1],
-                                    wordList[i]))
+            entryDict[WORD].append(
+                (adjustedPhonList[startI][0], adjustedPhonList[stopI][1], wordList[i])
+            )
 
         numTotalPhones += numWords
 
-    statList = [numPhonesFailedToAlign, numTotalPhones,
-                numFailedIntervals, numIntervals]
+    statList = [
+        numPhonesFailedToAlign,
+        numTotalPhones,
+        numFailedIntervals,
+        numIntervals,
+    ]
     return entryDict, statList
 
 
 def formatTextForJulius(line, cabochaEncoding, cabochaPath):
-    '''Prepares a single line of text, processed by cabocha, for use in julius'''
+    """Prepares a single line of text, processed by cabocha, for use in julius"""
     unidentifiedUtterance = 0
     unnamedEntity = 0
 
@@ -312,8 +329,23 @@ def formatTextForJulius(line, cabochaEncoding, cabochaPath):
 
     # Clean up the line before it gets processed
     # Not sure what "・" is but cabocha doesn't like it
-    for char in [u"（", u"）", u" ", u"．", u"？", u"「", u"」",
-                 u"［", u"］", u"＠Ｗ", u"＠Ｓ", u"＜", u"＞", u" ", u"。"]:
+    for char in [
+        u"（",
+        u"）",
+        u" ",
+        u"．",
+        u"？",
+        u"「",
+        u"」",
+        u"［",
+        u"］",
+        u"＠Ｗ",
+        u"＠Ｓ",
+        u"＜",
+        u"＞",
+        u" ",
+        u"。",
+    ]:
         line = line.replace(char, "")
 
     # Used to split names?
@@ -323,12 +355,10 @@ def formatTextForJulius(line, cabochaEncoding, cabochaPath):
     line = line.strip()
 
     try:
-        (tmpWordList, tmpKanaList,
-         tmpRomajiList) = jProcessingSnippet.getChunkedKana(line,
-                                                            cabochaEncoding,
-                                                            cabochaPath)
-    except (jProcessingSnippet.ChunkingError,
-            jProcessingSnippet.NonKatakanaError) as e:
+        (tmpWordList, tmpKanaList, tmpRomajiList) = jProcessingSnippet.getChunkedKana(
+            line, cabochaEncoding, cabochaPath
+        )
+    except (jProcessingSnippet.ChunkingError, jProcessingSnippet.NonKatakanaError) as e:
         print(u"%s, %s" % (str(e), origLine))
         unidentifiedUtterance = 1
     except jProcessingSnippet.UnidentifiedJapaneseText as e:
@@ -345,6 +375,12 @@ def formatTextForJulius(line, cabochaEncoding, cabochaPath):
         raise
     line = line.replace(u",", u"")
 
-    return (line, ",".join(tmpWordList), ",".join(tmpKanaList),
-            ",".join(tmpRomajiList), unidentifiedUtterance, unnamedEntity,
-            len(tmpWordList))
+    return (
+        line,
+        ",".join(tmpWordList),
+        ",".join(tmpKanaList),
+        ",".join(tmpRomajiList),
+        unidentifiedUtterance,
+        unnamedEntity,
+        len(tmpWordList),
+    )

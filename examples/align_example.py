@@ -51,10 +51,29 @@ alignFromTextgrid.convertCorpusToKanaAndRomaji(
     encoding="utf-8",
 )
 
-print("\nSTEP 3: Run the force aligner")
+
+print("\nSTEP 3: Splitting text on silence")
+alignFromTextgrid.segmentPhrasesOnSmallPause(
+    transcriptPath=cabochaOutput,
+    wavPath=path,
+    outputPath=splitOnSilencePath,
+    tmpFolder=splitOnSilenceTmp,
+    soxPath=soxPath,
+)
+
+print("\nSTEP 4: Converting all text to kana for split-on-silence segments")
+alignFromTextgrid.convertCorpusToKanaAndRomaji(
+    inputPath=splitOnSilencePath,
+    outputPath=cabochaSplitOnSilenceOutput,
+    cabochaEncoding=cabochaEncoding,
+    cabochaPath=cabochaPath,
+    encoding="utf-8",
+)
+
+print("\nSTEP 5: Run the force aligner")
 alignFromTextgrid.forceAlignCorpus(
     wavPath=path,
-    txtPath=cabochaOutput,
+    txtPath=cabochaSplitOnSilenceOutput,
     outputPath=alignedOutput,
     juliusScriptPath=juliusScriptPath,
     soxPath=soxPath,

@@ -16,6 +16,9 @@ from pyjuliusalign import alignFromTextgrid
 path = join(".", "files")
 cabochaOutput = join(path, "cabocha_output")
 alignedOutput = join(path, "aligned_output")
+splitOnSilencePath = join(path, "split_on_silence_output")
+splitOnSilenceTmp = join(path, "split_on_silence_tmp_files")
+cabochaSplitOnSilenceOutput = join(path, "split_on_silence_cabocha_output")
 
 # Windows executables
 juliusScriptPath = (

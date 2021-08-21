@@ -54,7 +54,12 @@ alignFromTextgrid.convertCorpusToKanaAndRomaji(
     encoding="utf-8",
 )
 
-
+# If you want to split text on silence, run steps 3 and steps 4
+# If you don't need to split text on silence, then jump to step 5
+# Splitting on silence can be useful if long pauses exist in each
+# text transcript.
+# segmentPhrasesOnSmallPause does a lot of guessing and may or may
+# not work well with your data (your feedback is helpeful!)
 print("\nSTEP 3: Splitting text on silence")
 alignFromTextgrid.segmentPhrasesOnSmallPause(
     transcriptPath=cabochaOutput,

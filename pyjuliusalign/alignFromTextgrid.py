@@ -96,6 +96,8 @@ def segmentPhrasesOnSmallPause(transcriptPath, wavPath, outputPath, tmpFolder, s
                     singleChannelFlag=False,
                     soxPath=soxPath,
                 )
+
+                # Find spoken segments
                 silences = getSilencesInAudio(tmpWavFN)
                 audio = AudioSegment.from_wav(tmpWavFN)
                 speechSegments = invertIntervalList(silences, 0, audio.duration_seconds)
@@ -103,6 +105,7 @@ def segmentPhrasesOnSmallPause(transcriptPath, wavPath, outputPath, tmpFolder, s
                     (start + snippetStart, start + snippetEnd)
                     for snippetStart, snippetEnd in speechSegments
                 ]
+                speechSegments = removeUltrashortSegments(speechSegments, 0.2)
                 # speechSegments = bumpUltrashortSegments(speechSegments)
                 bucketDurations = [
                     snippetEnd - snippetStart
@@ -133,6 +136,15 @@ def segmentPhrasesOnSmallPause(transcriptPath, wavPath, outputPath, tmpFolder, s
             with io.open(join(outputPath, fn), "w", encoding="utf-8") as fd:
                 csv_writer = csv.writer(fd)
                 csv_writer.writerows(outputList)
+
+
+def removeUltrashortSegments(speechSegments, threshold):
+    newSpeechSegments = []
+    for start, stop in speechSegments:
+        if stop - start >= threshold:
+            newSpeechSegments.append((start, stop))
+
+    return newSpeechSegments
 
 
 def bumpUltrashortSegments(speechSegments):

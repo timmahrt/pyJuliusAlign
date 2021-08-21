@@ -46,6 +46,12 @@ To get started:
 
 ## Major Revisions
 
+Ver 3.1.0 (August 21, 2021)
+- Added alignFromTextgrid.segmentPhrasesOnSmallPause for avoided problems with small pauses
+  - it is a very fuzzy process thats guesses and makes assumptions -- feedback is helpful!
+  - (see align_example.py and new test file introduction_one_line.TextGrid)
+- Requires a new python library (pydub)
+
 Ver 3.0.0 (October 11, 2020)
 - Fixed a bug preventing the use of triphone models.
 - Requires a new python library (python-Levenshtein)
@@ -68,6 +74,9 @@ python - https://www.python.org/
 
 python-Levenshtein
 - https://github.com/ztane/python-Levenshtein
+
+pyDub
+- https://github.com/jiaaro/pydub
 
 praatIO - https://github.com/timmahrt/praatIO
  - for textgrid manipulations
@@ -98,6 +107,7 @@ Cabocha - http://taku910.github.io/cabocha/
  - used to convert typical Japanese text into romaji/phones.
  - (throw it into google translate if you need it in English)
  - make a note of which encoding you use for the dictionary file--you'll need it in the code
+ - (you may need to configure cabocha post-install; see https://github.com/timmahrt/pyJuliusAlign/issues/7)
 
 Perl (for Julius)
 

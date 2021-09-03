@@ -10,7 +10,7 @@ import io
 
 setup(
     name="pyjuliusalign",
-    version="3.1.0",
+    version="3.1.1",
     author="Tim Mahrt",
     author_email="timmahrt@gmail.com",
     url="https://github.com/timmahrt/pyJuliusAlign",

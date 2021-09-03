@@ -68,7 +68,7 @@ def runJuliusAlignment(resourcePath, juliusScriptPath, perlPath, loggerFd):
     resourcePath = os.path.abspath(resourcePath)
 
     cmdList = [perlPath, juliusScriptPath, resourcePath]
-    print(cmdList)
+    print(" ".join(cmdList))
     myProcess = subprocess.Popen(cmdList, stdout=loggerFd)
 
     if myProcess.wait():
@@ -111,7 +111,10 @@ def mapJuliusPronunciationToCabocha(juliusPhonesTxt, cabochaPhonesByWord):
         wordIndicies = []
         for word in cabochaPhonesByWord:
             wordIndicies.append([startI, startI + len(word)])
-            startI += len(word)
+            # There is a space between each word but when
+            # we split a segment into words, those characters are
+            # lost (thus + 1 here)
+            startI += len(word) + 1
 
         return wordIndicies
 
@@ -133,7 +136,8 @@ def mapJuliusPronunciationToCabocha(juliusPhonesTxt, cabochaPhonesByWord):
     # of phones as juliusPhonesTxt
     edits = Levenshtein.editops(cabochaPhonesTxt, juliusPhonesTxt)
     wordIndicies = _buildWordIndicies(cabochaPhonesByWord)
-    for operation, startIndex, _ in edits:
+    # Iterate in reverse between we're deleting content
+    for operation, startIndex, _ in edits[::-1]:
         wordI = _getWordForCharIndex(wordIndicies, startIndex)
         if operation == "delete":
             cabochaPhonesByWord[wordI] = cabochaPhonesByWord[wordI][:-1]

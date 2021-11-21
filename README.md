@@ -41,6 +41,7 @@ To get started:
 3. [Installation](#installation)
 4. [Testing Installation](#testing-installation)
 5. [Example Usage](#example-usage)
+5. [Tests](#tests)
 6. [Troubleshooting](#troubleshooting)
 
 
@@ -158,6 +159,13 @@ Also, you will need to configure "segment_julius.pl" which is a part of the Juli
 Please see /examples for an example usage.
 
 There is pretty much only one way to use this library at the moment. Please contact me if you are having difficulties using this library.
+
+
+## Tests
+
+I run tests with the following command (this requires pytest and pytest-cov to be installed):
+
+`pytest --cov=pyjuliusalign tests/`
 
 
 ## Troubleshooting

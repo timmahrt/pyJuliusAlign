@@ -10,7 +10,8 @@ import io
 
 setup(
     name="pyjuliusalign",
-    version="3.1.1",
+    python_requires=">3.6.0",
+    version="4.0.0",
     author="Tim Mahrt",
     author_email="timmahrt@gmail.com",
     url="https://github.com/timmahrt/pyJuliusAlign",
@@ -19,7 +20,12 @@ setup(
     package_data={"pyjuliusalign": ["hiraganaChart.txt", "katakanaChart.txt"]},
     license="LICENSE",
     description="A helper library for doing forced-alignment in Japanese with Julius.",
-    install_requires=["praatio ~= 4.1", "python-Levenshtein", "pydub"],
+    install_requires=[
+        "praatio >= 5.0",
+        "python-Levenshtein",
+        "pydub",
+        "typing_extensions",
+    ],
     long_description=io.open("README.md", "r", encoding="utf-8").read(),
     long_description_content_type="text/markdown",
 )

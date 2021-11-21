@@ -23,7 +23,7 @@ from pyjuliusalign import jProcessingSnippet
 from pyjuliusalign import juliusAlignment
 from pyjuliusalign import audioScripts
 
-from praatio import tgio
+from praatio import textgrid
 
 
 def convertCorpusToUTF8(path):
@@ -214,7 +214,7 @@ def forceAlignFile(
         numIntervals += statList[3]
 
     # Create tiers and textgrids
-    tg = tgio.Textgrid()
+    tg = textgrid.Textgrid()
     maxDuration = audioScripts.getSoundFileDuration(join(wavPath, wavName + "_L.wav"))
     for speaker in ["L", "R"]:
         for aspect in [
@@ -225,7 +225,7 @@ def forceAlignFile(
 
             tierName = "%s_%s" % (aspect, speaker)
 
-            tier = tgio.IntervalTier(
+            tier = textgrid.IntervalTier(
                 tierName, speakerEntryDict[speaker][aspect], minT=0, maxT=maxDuration
             )
             tg.addTier(tier)

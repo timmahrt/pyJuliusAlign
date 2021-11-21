@@ -19,7 +19,7 @@ from pyjuliusalign import utils
 from pyjuliusalign import juliusAlignment
 from pyjuliusalign import audioScripts
 
-from praatio import tgio
+from praatio import textgrid
 from pydub import AudioSegment, silence
 
 
@@ -252,7 +252,7 @@ def textgridToCSV(inputPath, outputPath, outputExt=".csv", tierName="utterances"
     utils.makeDir(outputPath)
 
     for fn in utils.findFiles(inputPath, filterExt=".TextGrid"):
-        tg = tgio.openTextgrid(join(inputPath, fn))
+        tg = textgrid.openTextgrid(join(inputPath, fn))
         tier = tg.tierDict[tierName]
         outputList = []
         for start, stop, label in tier.entryList:
@@ -434,7 +434,7 @@ def forceAlignFile(
     maxDuration = audioScripts.getSoundFileDuration(join(wavPath, inputWavFN))
 
     # Create tiers and textgrids from the output of the alignment
-    tg = tgio.Textgrid()
+    tg = textgrid.Textgrid()
     for speaker in speakerList:
         for aspect in [
             juliusAlignment.UTTERANCE,
@@ -443,7 +443,7 @@ def forceAlignFile(
         ]:
 
             tierName = "%s_%s" % (aspect, speaker)
-            tier = tgio.IntervalTier(
+            tier = textgrid.IntervalTier(
                 tierName, speakerEntryDict[speaker][aspect], minT=0, maxT=maxDuration
             )
             tg.addTier(tier)

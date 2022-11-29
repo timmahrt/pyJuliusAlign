@@ -291,6 +291,8 @@ def convertCorpusToKanaAndRomaji(
         speakerInfoList = []
         for line in textList:
             line = line.strip()
+            if len(line) <= 0:
+                continue
             try:
                 startTime, stopTime, line = line.split(",", 2)
             except ValueError:

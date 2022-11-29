@@ -178,7 +178,7 @@ def juliusAlignCabocha(
     tmpOutputPath = join(wavPath, "align_tmp")
     utils.makeDir(tmpOutputPath)
 
-    logFn = join(tmpOutputPath, "align_log_" + str(datetime.datetime.now()) + ".txt")
+    logFn = join(tmpOutputPath, "align_log_" + str(datetime.datetime.now().strftime("%Y%m%d%H%M%S%f")) + ".txt")
     loggerFd = open(logFn, "w")
 
     utils.makeDir(tmpOutputPath)

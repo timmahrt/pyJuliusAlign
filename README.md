@@ -122,10 +122,12 @@ I use a mac and was able to easily install many requirements using Homebrew.  He
 
 ### Windows-specific Requirements Information
 
-I currently don't have access to a Windows machine. Earlier, I tested installation and got as far as running Julius. Perl tried to run gzip which I couldn't get to install.
-
-One user was able to get it working on Windows by installing cygwin and adding cygwin to the path in environment variables.  Also, they had to install MeCab before running Cabocha, otherwise, they would receive an exception saying there's something wrong with Cabocha.
-
+Windows users can easily build up the environment, but need to pay attention to the following things:
+- Sox needs to be installed in a path without space (default setup into Program Files is not usable).
+- [ffmpeg](https://ffmpeg.org/) is needed.
+- [MeCab](https://taku910.github.io/mecab/) should be downloaded and installed before Cabocha. the encoding selection during their installation should be the same.
+- in Julius Segmentation Kit there is a `$juliusbin` variable at line 50, set it to the absolute path of Julius executable.
+- it's recommended to set the environment virable %PATH% for Cabocha, ffmpeg, MeCab, Sox, Julius executables.
 
 ## Installation
 

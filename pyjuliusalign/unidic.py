@@ -6,7 +6,7 @@ Created on Aug 19, 2014
 """
 
 from os.path import join
-import cPickle
+import pickle
 import io
 
 
@@ -42,4 +42,4 @@ class UnidicTool(object):
         return matchList
 
     def saveCache(self):
-        cPickle.dump(self.cachedData, open(self.unidicCachePath, "w"))
+        pickle.dump(self.cachedData, open(self.unidicCachePath, "w"))

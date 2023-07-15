@@ -45,7 +45,6 @@ def getSoundFileDuration(fn):
 
 
 def extractSubwav(fn, outputFN, startT, endT, singleChannelFlag, soxPath=None):
-
     if soxPath is None:
         soxPath = "sox"  # Assumes it is in the user's path
 
@@ -99,7 +98,6 @@ def extractSubwav(fn, outputFN, startT, endT, singleChannelFlag, soxPath=None):
 
 
 def splitStereoAudio(path, fn, outputPath=None):
-
     if outputPath is None:
         outputPath = join(path, "split_audio")
 
@@ -123,7 +121,6 @@ def splitStereoAudio(path, fn, outputPath=None):
         (1, 0, leftOutputFN),
         (0, 1, rightOutputFN),
     ):
-
         monoAudioFrames = audioop.tomono(
             audioFrames, sampwidth, leftFactor, rightFactor
         )

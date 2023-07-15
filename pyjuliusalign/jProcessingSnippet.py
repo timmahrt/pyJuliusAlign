@@ -32,7 +32,7 @@ class UnidentifiedJapaneseText(Exception):
         self.word = word
 
     def __str__(self):
-        return u"No match in dictionary for word '%s' in sentence: \n'%s'" % (
+        return "No match in dictionary for word '%s' in sentence: \n'%s'" % (
             self.word,
             self.sentence,
         )
@@ -46,7 +46,7 @@ class ChunkingError(Exception):
         self.textStr = txt
 
     def __str__(self):
-        return u"Chunking error for string: \n %s" % self.textStr
+        return "Chunking error for string: \n %s" % self.textStr
 
 
 class EmptyStrError(Exception):
@@ -61,7 +61,7 @@ class NonKatakanaError(Exception):
         self.utterance = utterance
 
     def __str__(self):
-        return u"Wrongly interpreted character '%s' as kana in utterance:\n%s" % (
+        return "Wrongly interpreted character '%s' as kana in utterance:\n%s" % (
             unicode(self.char),
             unicode(self.utterance),
         )
@@ -74,7 +74,7 @@ class CabochaNotRunError(Exception):
 
     def __str__(self):
         return (
-            u"Cabocha not installed or not in path.  "
+            "Cabocha not installed or not in path.  "
             "Attempted to run command:\n%s" % self.cabochaCmd
         )
 
@@ -157,7 +157,6 @@ def cabocha(sentence, cabochaEncoding, cabochaPath=None):
 
 
 def jReads(target_sent, cabochaEncoding, cabochaPath):
-
     xmlStr = cabocha(target_sent, cabochaEncoding, cabochaPath).encode("utf-8")
     #     print(target_sent)
     #     print(xmlStr)
@@ -171,28 +170,27 @@ def jReads(target_sent, cabochaEncoding, cabochaPath):
 
     keyList = list(convertKana.kataToRomajiDict.keys())
     validKatakanaList = [
-        u"ャ",
-        u"ュ",
-        u"ョ",
-        u"ッ",
-        u"ァ",
-        u"ィ",
-        u"ゥ",
-        u"ェ",
-        u"ォ",
-        u"ー",
+        "ャ",
+        "ュ",
+        "ョ",
+        "ッ",
+        "ァ",
+        "ィ",
+        "ゥ",
+        "ェ",
+        "ォ",
+        "ー",
     ] + keyList
     #     validHiraganaList = [u"ゃ", u"ゅ", u"ょ", u"っ"] + convertKana.kanaToRomajiDict.keys()
     for chunk in sentence:
         jReadsToks = []
         wordList = []
         for tok in chunk.findall("tok"):
-
             # Determine if this word is punctuation (and if so, skip it)
             # Contains syntactic and morphological information
             featureStr = tok.get("feature")
             featureList = featureStr.split(",")
-            if featureList[0] == u"記号":
+            if featureList[0] == "記号":
                 continue
 
             # Don't process empty words (can happen a lot,
@@ -226,7 +224,6 @@ def jReads(target_sent, cabochaEncoding, cabochaPath):
 
 
 def getChunkedKana(string, cabochaEncoding, cabochaPath):
-
     if string == "":
         raise EmptyStrError()
 
@@ -240,7 +237,7 @@ def getChunkedKana(string, cabochaEncoding, cabochaPath):
     def mergeTailingVowel(tmpList):
         retList = []
         for word in tmpList:
-            if word[0] == u"ー":
+            if word[0] == "ー":
                 retList[-1] += word
             else:
                 retList.append(word)
@@ -249,13 +246,12 @@ def getChunkedKana(string, cabochaEncoding, cabochaPath):
     kanaList = mergeTailingVowel(kanaList)
     wordList = mergeTailingVowel(wordList)
 
-    vowelList = [u"ア", u"イ", u"ウ", u"エ", u"オ"]
-    vowelModifierDict = {u"ァ": u"a", u"ィ": u"i", u"ゥ": u"u", u"ェ": u"e", u"ォ": u"o"}
-    yModifierDict = {u"ャ": u"ya", u"ュ": u"yu", u"ョ": u"yo"}
+    vowelList = ["ア", "イ", "ウ", "エ", "オ"]
+    vowelModifierDict = {"ァ": "a", "ィ": "i", "ゥ": "u", "ェ": "e", "ォ": "o"}
+    yModifierDict = {"ャ": "ya", "ュ": "yu", "ョ": "yo"}
 
     romanjiedTextList = []
     for word in kanaList:
-
         # Sanitize kana
         try:
             kanaInputList = chunkKatakana(word)
@@ -265,13 +261,12 @@ def getChunkedKana(string, cabochaEncoding, cabochaPath):
         # Convert kana to romanji
         romanjiList = []
         for kana in kanaInputList:
-
             # Over-write the previous vowel (foreign words)
             if kana in vowelModifierDict.keys():
                 romanjiList[-1] = romanjiList[-1][:-1] + vowelModifierDict[kana]
 
             # Last vowel is a long vowel
-            elif kana == u"ー":  # Long vowel
+            elif kana == "ー":  # Long vowel
                 # e.g. 'ホーー' becomes "ho::" or 'ふうんー' becomes "hu:n:"
                 #  -- both bad
                 if romanjiList[-1][-1] != ":" and romanjiList[-1][-1] != "N":
@@ -282,7 +277,7 @@ def getChunkedKana(string, cabochaEncoding, cabochaPath):
             # Normal case
             else:
                 # Single-phone characters
-                if kana == u"ン" or kana in vowelList:
+                if kana == "ン" or kana in vowelList:
                     romanjiList.append(convertKana.kataToRomajiDict[kana])
                 else:
                     if kana in yModifierDict.keys():  # e.g. 'ィ' in 'ティム'
@@ -317,10 +312,10 @@ def chunkKatakana(kanaStr):
         kana = kanaList[i]
         # Some palatalized consonants are in our chart
         # (notably 'jy' and 'shy' are missing)
-        kanaFlag = kana in [u"ャ", u"ュ", u"ョ"]
+        kanaFlag = kana in ["ャ", "ュ", "ョ"]
         if kanaFlag and returnList[-1] + kana in convertKana.kataToRomajiDict.keys():
             returnList[-1] += kana
-        elif kana == u"ッ":  # Geminate consonant
+        elif kana == "ッ":  # Geminate consonant
             pass
         else:  # Normal case
             returnList.append(kana)

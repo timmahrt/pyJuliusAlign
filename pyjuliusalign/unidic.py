@@ -31,8 +31,8 @@ class UnidicTool(object):
         matchList = []
         while True:
             try:
-                matchI = self.data.index(u"\n" + word, startI) + 1
-                endI = self.data.index(u"\n", matchI)
+                matchI = self.data.index("\n" + word, startI) + 1
+                endI = self.data.index("\n", matchI)
             except ValueError:
                 break
 

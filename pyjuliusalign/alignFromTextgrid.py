@@ -318,7 +318,7 @@ def convertCorpusToKanaAndRomaji(
 
             name = os.path.splitext(fn)[0]
             outputList = [
-                u"%s,%s,%s" % (name, startTime, stopTime),
+                "%s,%s,%s" % (name, startTime, stopTime),
                 origLine,
                 tmpWordList,
                 tmpKanaList,
@@ -441,7 +441,6 @@ def forceAlignFile(
             juliusAlignment.WORD,
             juliusAlignment.PHONE,
         ]:
-
             tierName = "%s_%s" % (aspect, speaker)
             tier = textgrid.IntervalTier(
                 tierName, speakerEntryDict[speaker][aspect], minT=0, maxT=maxDuration

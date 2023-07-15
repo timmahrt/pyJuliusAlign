@@ -21,7 +21,7 @@ setup(
     license="LICENSE",
     description="A helper library for doing forced-alignment in Japanese with Julius.",
     install_requires=[
-        "praatio >= 5.0",
+        "praatio ~= 6.0",
         "python-Levenshtein",
         "pydub",
         "typing_extensions",

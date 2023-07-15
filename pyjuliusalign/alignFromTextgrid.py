@@ -252,10 +252,10 @@ def textgridToCSV(inputPath, outputPath, outputExt=".csv", tierName="utterances"
     utils.makeDir(outputPath)
 
     for fn in utils.findFiles(inputPath, filterExt=".TextGrid"):
-        tg = textgrid.openTextgrid(join(inputPath, fn))
-        tier = tg.tierDict[tierName]
+        tg = textgrid.openTextgrid(join(inputPath, fn), includeEmptyIntervals=False)
+        tier = tg.getTier(tierName)
         outputList = []
-        for start, stop, label in tier.entryList:
+        for start, stop, label in tier.entries:
             outputList.append("%s,%s,%s" % (start, stop, label))
 
         name = os.path.splitext(fn)[0]
@@ -447,7 +447,11 @@ def forceAlignFile(
             )
             tg.addTier(tier)
 
-    tg.save(join(outputPath, outputWavName + ".TextGrid"))
+    tg.save(
+        join(outputPath, outputWavName + ".TextGrid"),
+        format="short_textgrid",
+        includeBlankSpaces=True,
+    )
 
     return (numPhonesFailedAlignment, numPhones, numFailedIntervals, numIntervals)
 

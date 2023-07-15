@@ -8,6 +8,7 @@ I don't recall the details of this file, but apparently I used
 the force aligner with the crest corpus. Maybe its useful as an example.
 """
 
+# Running this will fail, but feel free to get ideas from the code
 import sys
 
 reload(sys)
@@ -227,7 +228,11 @@ def forceAlignFile(
             )
             tg.addTier(tier)
 
-    tg.save(join(outputPath, wavName + ".TextGrid"))
+    tg.save(
+        join(outputPath, wavName + ".TextGrid"),
+        format="short_textgrid",
+        includeBlankSpaces=True,
+    )
 
     return (numPhonesFailedAlignment, numPhones, numFailedIntervals, numIntervals)
 

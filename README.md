@@ -34,38 +34,29 @@ To get started:
 
 
 # Table of contents
-1. [Major Revisions](#major-revisions)
-2. [Requirements](#requirements)
+1. [Documentation](#documentation)
+2. [Major Revisions](#major-revisions)
+3. [Requirements](#requirements)
   * [Mac-specific Requirements Information](#mac-specific-requirements-information)
   * [Windows-specific Requirements Information](#windows-specific-requirements-information)
-3. [Installation](#installation)
-4. [Testing Installation](#testing-installation)
-5. [Example Usage](#example-usage)
-6. [Troubleshooting](#troubleshooting)
+4. [Installation](#installation)
+5. [Testing Installation](#testing-installation)
+6. [Example Usage](#example-usage)
+7. [Tests](#tests)
+8. [Troubleshooting](#troubleshooting)
+
+## Documentation
+
+Automatically generated pdocs can be found here:
+
+http://timmahrt.github.io/pyJuliusAlign/
 
 
 ## Major Revisions
 
-Ver 3.1.0 (August 21, 2021)
-- Added alignFromTextgrid.segmentPhrasesOnSmallPause for avoided problems with small pauses
-  - it is a very fuzzy process thats guesses and makes assumptions -- feedback is helpful!
-  - (see align_example.py and new test file introduction_one_line.TextGrid)
-- Requires a new python library (pydub)
+*PyJuliusAlign uses semantic versioning (Major.Minor.Patch)*
 
-Ver 3.0.0 (October 11, 2020)
-- Fixed a bug preventing the use of triphone models.
-- Requires a new python library (python-Levenshtein)
-
-Ver 2.0 (January 12, 2019)
-- pyJuliusAlign now works with the latest version of Julius and the Julius Segmentation Kit.
-  - If you need to use the old segmentation kit (segment_julius4.pl), please use pyJuliusAlign ver 1.1 
-- Quality of life improvements + documentation
-
-Ver 1.1 (August 12, 2018)
-- Python 3.x support
-
-Ver 1.0 (September 2, 2014)
-- Users can force-align words and phones for transcribed speech in Japanese
+Please view [CHANGELOG.md](https://github.com/timmahrt/praatIO/blob/main/CHANGELOG.md) for version history.
 
 
 ## Requirements
@@ -126,7 +117,6 @@ I currently don't have access to a Windows machine. Earlier, I tested installati
 
 One user was able to get it working on Windows by installing cygwin and adding cygwin to the path in environment variables.  Also, they had to install MeCab before running Cabocha, otherwise, they would receive an exception saying there's something wrong with Cabocha.
 
-
 ## Installation
 
 PyJuliusAlign is on pypi and can be installed or upgraded from the command-line shell with pip like so::
@@ -160,9 +150,16 @@ Please see /examples for an example usage.
 There is pretty much only one way to use this library at the moment. Please contact me if you are having difficulties using this library.
 
 
+## Tests
+
+I run tests with the following command (this requires pytest and pytest-cov to be installed):
+
+`pytest --cov=pyjuliusalign tests/`
+
+
 ## Troubleshooting
 
-The scripts should catch any issues along the way with the exception of  issues stemming from Julius.  If you get bogus/null results, most likely Julius hasn't been set up correctly.
+The scripts should catch any issues along the way with the exception of issues stemming from Julius.  If you get bogus/null results, most likely Julius hasn't been set up correctly.
 
 The Julius Segmentation kit comes with an example.  If you can force align that, then you should be able to force align using this script as well.
 

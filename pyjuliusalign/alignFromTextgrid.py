@@ -19,7 +19,7 @@ from pyjuliusalign import utils
 from pyjuliusalign import juliusAlignment
 from pyjuliusalign import audioScripts
 
-from praatio import tgio
+from praatio import textgrid
 from pydub import AudioSegment, silence
 
 
@@ -252,10 +252,10 @@ def textgridToCSV(inputPath, outputPath, outputExt=".csv", tierName="utterances"
     utils.makeDir(outputPath)
 
     for fn in utils.findFiles(inputPath, filterExt=".TextGrid"):
-        tg = tgio.openTextgrid(join(inputPath, fn))
-        tier = tg.tierDict[tierName]
+        tg = textgrid.openTextgrid(join(inputPath, fn), includeEmptyIntervals=False)
+        tier = tg.getTier(tierName)
         outputList = []
-        for start, stop, label in tier.entryList:
+        for start, stop, label in tier.entries:
             outputList.append("%s,%s,%s" % (start, stop, label))
 
         name = os.path.splitext(fn)[0]
@@ -318,7 +318,7 @@ def convertCorpusToKanaAndRomaji(
 
             name = os.path.splitext(fn)[0]
             outputList = [
-                u"%s,%s,%s" % (name, startTime, stopTime),
+                "%s,%s,%s" % (name, startTime, stopTime),
                 origLine,
                 tmpWordList,
                 tmpKanaList,
@@ -434,21 +434,24 @@ def forceAlignFile(
     maxDuration = audioScripts.getSoundFileDuration(join(wavPath, inputWavFN))
 
     # Create tiers and textgrids from the output of the alignment
-    tg = tgio.Textgrid()
+    tg = textgrid.Textgrid()
     for speaker in speakerList:
         for aspect in [
             juliusAlignment.UTTERANCE,
             juliusAlignment.WORD,
             juliusAlignment.PHONE,
         ]:
-
             tierName = "%s_%s" % (aspect, speaker)
-            tier = tgio.IntervalTier(
+            tier = textgrid.IntervalTier(
                 tierName, speakerEntryDict[speaker][aspect], minT=0, maxT=maxDuration
             )
             tg.addTier(tier)
 
-    tg.save(join(outputPath, outputWavName + ".TextGrid"))
+    tg.save(
+        join(outputPath, outputWavName + ".TextGrid"),
+        format="short_textgrid",
+        includeBlankSpaces=True,
+    )
 
     return (numPhonesFailedAlignment, numPhones, numFailedIntervals, numIntervals)
 

@@ -49,7 +49,6 @@ def findFiles(
     skipIfNameInList=None,
     stripExt=False,
 ):
-
     fnList = os.listdir(path)
 
     if filterPaths is True:

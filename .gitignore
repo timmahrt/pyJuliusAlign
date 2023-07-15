@@ -58,3 +58,6 @@ docs/_build/
 *.project
 *.pydevproject
 *.settings
+
+examples/files/*
+examples/files_hmm/*

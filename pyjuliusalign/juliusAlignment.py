@@ -61,7 +61,6 @@ class JuliusScriptExecutionFailed(Exception):
 
 
 def runJuliusAlignment(resourcePath, juliusScriptPath, perlPath, loggerFd):
-
     if not os.path.exists(juliusScriptPath):
         raise JuliusRunError(juliusScriptPath)
 
@@ -272,7 +271,7 @@ def juliusAlignCabocha(
                 numFailedIntervals += 1
                 print(
                     "Failed to align: %s - %f - %f"
-                    % ("".join(romajiList), intervalStart, intervalEnd)
+                    % ("".join(tmpRomajiList), intervalStart, intervalEnd)
                 )
                 continue
 
@@ -336,26 +335,26 @@ def formatTextForJulius(line, cabochaEncoding, cabochaPath):
     # Clean up the line before it gets processed
     # Not sure what "・" is but cabocha doesn't like it
     for char in [
-        u"（",
-        u"）",
-        u" ",
-        u"．",
-        u"？",
-        u"「",
-        u"」",
-        u"［",
-        u"］",
-        u"＠Ｗ",
-        u"＠Ｓ",
-        u"＜",
-        u"＞",
-        u" ",
-        u"。",
+        "（",
+        "）",
+        " ",
+        "．",
+        "？",
+        "「",
+        "」",
+        "［",
+        "］",
+        "＠Ｗ",
+        "＠Ｓ",
+        "＜",
+        "＞",
+        " ",
+        "。",
     ]:
         line = line.replace(char, "")
 
     # Used to split names?
-    for char in [u"・", u"·"]:
+    for char in ["・", "·"]:
         line = line.replace(char, " ")
 
     line = line.strip()
@@ -365,21 +364,21 @@ def formatTextForJulius(line, cabochaEncoding, cabochaPath):
             line, cabochaEncoding, cabochaPath
         )
     except (jProcessingSnippet.ChunkingError, jProcessingSnippet.NonKatakanaError) as e:
-        print(u"%s, %s" % (str(e), origLine))
+        print("%s, %s" % (str(e), origLine))
         unidentifiedUtterance = 1
     except jProcessingSnippet.UnidentifiedJapaneseText as e:
         # Maybe specific to my corpus?
-        if all([char == u"X" for char in e.word]):
+        if all([char == "X" for char in e.word]):
             unnamedEntity = 1
         else:
-            print(u"%s" % str(e))
+            print("%s" % str(e))
             unidentifiedUtterance = 1
     except jProcessingSnippet.EmptyStrError as e:
         pass
     except Exception:
         print(line)
         raise
-    line = line.replace(u",", u"")
+    line = line.replace(",", "")
 
     return (
         line,

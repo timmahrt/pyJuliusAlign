@@ -8,6 +8,7 @@ I don't recall the details of this file, but apparently I used
 the force aligner with the crest corpus. Maybe its useful as an example.
 """
 
+# Running this will fail, but feel free to get ideas from the code
 import sys
 
 reload(sys)
@@ -23,11 +24,10 @@ from pyjuliusalign import jProcessingSnippet
 from pyjuliusalign import juliusAlignment
 from pyjuliusalign import audioScripts
 
-from praatio import tgio
+from praatio import textgrid
 
 
 def convertCorpusToUTF8(path):
-
     outputDir = join(path, "output")
     utils.makeDir(outputDir)
 
@@ -42,7 +42,6 @@ def convertCorpusToUTF8(path):
 def convertCRESTToKanaAndRomaji(
     inputPath, outputPath, cabochaEncoding, cabochaPath, encoding="cp932"
 ):
-
     timeInfoPath = join(outputPath, "speaker_info_and_utterance_timing")
 
     for path in [timeInfoPath]:
@@ -73,26 +72,26 @@ def convertCRESTToKanaAndRomaji(
             # Clean up the line before it gets processed
             # Not sure what "・" is but cabocha doesn't like it
             for char in [
-                u"（",
-                u"）",
-                u" ",
-                u"．",
-                u"？",
-                u"「",
-                u"」",
-                u"［",
-                u"］",
-                u"＠Ｗ",
-                u"＠Ｓ",
-                u"＜",
-                u"＞",
-                u" ",
-                u"。",
+                "（",
+                "）",
+                " ",
+                "．",
+                "？",
+                "「",
+                "」",
+                "［",
+                "］",
+                "＠Ｗ",
+                "＠Ｓ",
+                "＜",
+                "＞",
+                " ",
+                "。",
             ]:
                 line = line.replace(char, "")
 
             # Used to split names?
-            for char in [u"・", u"·"]:
+            for char in ["・", "·"]:
                 line = line.replace(char, " ")
 
             line = line.strip()
@@ -106,16 +105,16 @@ def convertCRESTToKanaAndRomaji(
                 jProcessingSnippet.ChunkingError,
                 jProcessingSnippet.NonKatakanaError,
             ) as e:
-                print(u"%s, %s" % (str(e), origLine))
+                print("%s, %s" % (str(e), origLine))
                 tmpWordList = [""]
                 tmpKanaList = [""]
                 tmpromajiList = [""]
                 numUnidentifiedUtterancesForFN += 1
             except jProcessingSnippet.UnidentifiedJapaneseText as e:
-                if all([char == u"X" for char in e.word]):
+                if all([char == "X" for char in e.word]):
                     numUnnamedEntitiesForFN += 1
                 else:
-                    print(u"%s" % str(e))
+                    print("%s" % str(e))
                     numUnidentifiedUtterancesForFN += 1
                 tmpWordList = [""]
                 tmpKanaList = [""]
@@ -127,9 +126,9 @@ def convertCRESTToKanaAndRomaji(
             except Exception:
                 print(line)
                 raise
-            line = line.replace(u",", u"")
+            line = line.replace(",", "")
             outputList = [
-                u"%s,%s,%s" % (speakerCode, startTime, stopTime),
+                "%s,%s,%s" % (speakerCode, startTime, stopTime),
                 origLine,
                 ",".join(tmpWordList),
                 ",".join(tmpKanaList),
@@ -214,7 +213,7 @@ def forceAlignFile(
         numIntervals += statList[3]
 
     # Create tiers and textgrids
-    tg = tgio.Textgrid()
+    tg = textgrid.Textgrid()
     maxDuration = audioScripts.getSoundFileDuration(join(wavPath, wavName + "_L.wav"))
     for speaker in ["L", "R"]:
         for aspect in [
@@ -222,21 +221,23 @@ def forceAlignFile(
             juliusAlignment.WORD,
             juliusAlignment.PHONE,
         ]:
-
             tierName = "%s_%s" % (aspect, speaker)
 
-            tier = tgio.IntervalTier(
+            tier = textgrid.IntervalTier(
                 tierName, speakerEntryDict[speaker][aspect], minT=0, maxT=maxDuration
             )
             tg.addTier(tier)
 
-    tg.save(join(outputPath, wavName + ".TextGrid"))
+    tg.save(
+        join(outputPath, wavName + ".TextGrid"),
+        format="short_textgrid",
+        includeBlankSpaces=True,
+    )
 
     return (numPhonesFailedAlignment, numPhones, numFailedIntervals, numIntervals)
 
 
 def forceAlignCrest(wavPath, txtPath, outputPath, juliusScriptPath, soxPath):
-
     totalNumPhonesFailed = 0
     totalNumPhones = 0
 
@@ -247,7 +248,6 @@ def forceAlignCrest(wavPath, txtPath, outputPath, juliusScriptPath, soxPath):
     for name in utils.findFiles(
         txtPath, filterExt=".txt", skipIfNameInList=finishedList, stripExt=True
     ):
-
         (
             numPhonesFailedAlignment,
             numPhones,
@@ -299,7 +299,6 @@ def forceAlignCrest(wavPath, txtPath, outputPath, juliusScriptPath, soxPath):
 
 
 def renameMP3Files(path):
-
     outputPath = join(path, "renamed")
     utils.makeDir(outputPath)
 
@@ -310,7 +309,6 @@ def renameMP3Files(path):
 
 
 def splitAudio(path):
-
     outputPath = join(path, "split_audio")
     utils.makeDir(outputPath)
 
@@ -319,7 +317,6 @@ def splitAudio(path):
 
 
 def getSelectedTxtFiles(txtPath, wavPath):
-
     outputPath = join(txtPath, "selected_txt")
     utils.makeDir(outputPath)
 

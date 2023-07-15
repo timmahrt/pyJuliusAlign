@@ -6,7 +6,7 @@ Created on Aug 19, 2014
 """
 
 from os.path import join
-import cPickle
+import pickle
 import io
 
 
@@ -31,8 +31,8 @@ class UnidicTool(object):
         matchList = []
         while True:
             try:
-                matchI = self.data.index(u"\n" + word, startI) + 1
-                endI = self.data.index(u"\n", matchI)
+                matchI = self.data.index("\n" + word, startI) + 1
+                endI = self.data.index("\n", matchI)
             except ValueError:
                 break
 
@@ -42,4 +42,4 @@ class UnidicTool(object):
         return matchList
 
     def saveCache(self):
-        cPickle.dump(self.cachedData, open(self.unidicCachePath, "w"))
+        pickle.dump(self.cachedData, open(self.unidicCachePath, "w"))

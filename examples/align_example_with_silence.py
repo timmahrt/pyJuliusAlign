@@ -16,6 +16,9 @@ from pyjuliusalign import alignFromTextgrid
 path = join(".", "files")
 cabochaOutput = join(path, "cabocha_output")
 alignedOutput = join(path, "aligned_output")
+splitOnSilencePath = join(path, "split_on_silence_output")
+splitOnSilenceTmp = join(path, "split_on_silence_tmp_files")
+cabochaSplitOnSilenceOutput = join(path, "split_on_silence_cabocha_output")
 
 # Windows executables
 juliusScriptPath = (
@@ -26,7 +29,6 @@ cabochaPath = r"C:\Program Files (x86)\CaboCha\bin\cabocha.exe"
 perlPath = r""
 
 # Mac/Unix executables
-# Use them directly if they're in your path or write out the full path to them
 juliusScriptPath = "/Users/tmahrt/Downloads/segmentation-kit/segment_julius.pl"
 soxPath = "sox"
 cabochaPath = "cabocha"
@@ -52,10 +54,34 @@ alignFromTextgrid.convertCorpusToKanaAndRomaji(
     encoding="utf-8",
 )
 
-print("\nSTEP 3: Run the force aligner")
+# If you want to split text on silence, run steps 3 and steps 4
+# If you don't need to split text on silence, then jump to step 5
+# Splitting on silence can be useful if long pauses exist in each
+# text transcript.
+# segmentPhrasesOnSmallPause does a lot of guessing and may or may
+# not work well with your data (your feedback is helpeful!)
+print("\nSTEP 3: Splitting text on silence")
+alignFromTextgrid.segmentPhrasesOnSmallPause(
+    transcriptPath=cabochaOutput,
+    wavPath=path,
+    outputPath=splitOnSilencePath,
+    tmpFolder=splitOnSilenceTmp,
+    soxPath=soxPath,
+)
+
+print("\nSTEP 4: Converting all text to kana for split-on-silence segments")
+alignFromTextgrid.convertCorpusToKanaAndRomaji(
+    inputPath=splitOnSilencePath,
+    outputPath=cabochaSplitOnSilenceOutput,
+    cabochaEncoding=cabochaEncoding,
+    cabochaPath=cabochaPath,
+    encoding="utf-8",
+)
+
+print("\nSTEP 5: Run the force aligner")
 alignFromTextgrid.forceAlignCorpus(
     wavPath=path,
-    txtPath=cabochaOutput,
+    txtPath=cabochaSplitOnSilenceOutput,
     outputPath=alignedOutput,
     juliusScriptPath=juliusScriptPath,
     soxPath=soxPath,

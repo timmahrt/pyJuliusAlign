@@ -52,15 +52,15 @@ def _invertDict(tmpDict):
 
 def _getKataToKanaDict():
     retDict = {
-        u"ャ": u"ゃ",
-        u"ュ": u"ゅ",
-        u"ョ": u"ょ",
-        u"ッ": u"っ",
-        u"ァ": u"ぁ",
-        u"ィ": u"ぃ",
-        u"ゥ": u"ぅ",
-        u"ェ": u"ぇ",
-        u"ォ": u"ぉ",
+        "ャ": "ゃ",
+        "ュ": "ゅ",
+        "ョ": "ょ",
+        "ッ": "っ",
+        "ァ": "ぁ",
+        "ィ": "ぃ",
+        "ゥ": "ぅ",
+        "ェ": "ぇ",
+        "ォ": "ぉ",
     }
 
     for kata in kataToRomajiDict.keys():
@@ -80,7 +80,7 @@ kanaToKataDict = _invertDict(kataToKanaDict)
 
 def convertKanaToKata(inputStr):
     """Input hiragana and return the corresponding string in katakana"""
-    retStr = u""
+    retStr = ""
     for char in inputStr:
         if char in kanaToKataDict.keys():
             char = kanaToKataDict[char]
@@ -91,7 +91,7 @@ def convertKanaToKata(inputStr):
 
 def convertKataToKana(inputStr):
     """Input hiragana and return the corresponding string in katakana"""
-    retStr = u""
+    retStr = ""
     for char in inputStr:
         if char in kataToKanaDict.keys():
             char = kataToKanaDict[char]

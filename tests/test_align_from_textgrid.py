@@ -3,7 +3,7 @@ import unittest
 from pyjuliusalign import alignFromTextgrid
 
 
-class AlignFromTextgridTestCase(unittest.TestCase):
+class TestAlignFromTextgrid(unittest.TestCase):
     def test_copy_chunking(self):
         self.assertEqual(
             [[10, 20, 30, 40], [50], [60]],

@@ -271,7 +271,7 @@ def juliusAlignCabocha(
                 numFailedIntervals += 1
                 print(
                     "Failed to align: %s - %f - %f"
-                    % ("".join(romajiList), intervalStart, intervalEnd)
+                    % ("".join(tmpRomajiList), intervalStart, intervalEnd)
                 )
                 continue
 

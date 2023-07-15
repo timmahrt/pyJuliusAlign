@@ -110,7 +110,6 @@ I currently don't have access to a Windows machine. Earlier, I tested installati
 
 One user was able to get it working on Windows by installing cygwin and adding cygwin to the path in environment variables.  Also, they had to install MeCab before running Cabocha, otherwise, they would receive an exception saying there's something wrong with Cabocha.
 
-
 ## Installation
 
 PyJuliusAlign is on pypi and can be installed or upgraded from the command-line shell with pip like so::

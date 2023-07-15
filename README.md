@@ -34,15 +34,22 @@ To get started:
 
 
 # Table of contents
-1. [Major Revisions](#major-revisions)
-2. [Requirements](#requirements)
+1. [Documentation](#documentation)
+2. [Major Revisions](#major-revisions)
+3. [Requirements](#requirements)
   * [Mac-specific Requirements Information](#mac-specific-requirements-information)
   * [Windows-specific Requirements Information](#windows-specific-requirements-information)
-3. [Installation](#installation)
-4. [Testing Installation](#testing-installation)
-5. [Example Usage](#example-usage)
-5. [Tests](#tests)
-6. [Troubleshooting](#troubleshooting)
+4. [Installation](#installation)
+5. [Testing Installation](#testing-installation)
+6. [Example Usage](#example-usage)
+7. [Tests](#tests)
+8. [Troubleshooting](#troubleshooting)
+
+## Documentation
+
+Automatically generated pdocs can be found here:
+
+http://timmahrt.github.io/pyJuliusAlign/
 
 
 ## Major Revisions
@@ -152,7 +159,7 @@ I run tests with the following command (this requires pytest and pytest-cov to b
 
 ## Troubleshooting
 
-The scripts should catch any issues along the way with the exception of  issues stemming from Julius.  If you get bogus/null results, most likely Julius hasn't been set up correctly.
+The scripts should catch any issues along the way with the exception of issues stemming from Julius.  If you get bogus/null results, most likely Julius hasn't been set up correctly.
 
 The Julius Segmentation kit comes with an example.  If you can force align that, then you should be able to force align using this script as well.
 
